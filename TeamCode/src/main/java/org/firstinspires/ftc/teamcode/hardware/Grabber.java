@@ -45,7 +45,7 @@ public class Grabber {
     }
 
     public void flipGrabberIn(){
-        grabberFlip.setDirection(Servo.Direction.REVERSE);
+        grabberFlip.setDirection(Servo.Direction.REVERSE); //test
         grabberFlip.setPosition(1.0);
         grabberIn = true;
     }
