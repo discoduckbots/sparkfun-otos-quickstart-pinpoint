@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 
+import org.firstinspires.ftc.teamcode.hardware.Arm;
 import org.firstinspires.ftc.teamcode.hardware.Grabber;
 import org.firstinspires.ftc.teamcode.hardware.HardwareStore;
 import org.firstinspires.ftc.teamcode.hardware.Intake;
@@ -15,6 +16,46 @@ public abstract class DuckbotAuto extends LinearOpMode {
 
     private static final double INTAKE_TIME = 1.5;
     private static final double INTAKE_SPEED = 1.0;
+
+    private static final double LIFT_SPEED = 0.5;
+
+    public class AutoArm {
+        private Arm arm;
+
+        public AutoArm(HardwareStore hardwareStore){
+            arm = hardwareStore.getArm();
+        }
+
+        public class ArmLiftToPosition implements Action {
+
+
+            private boolean initialized = false;
+            private int targetPosition = 0;
+
+            public ArmLiftToPosition(int targetPosition){
+                super();
+                this.targetPosition = targetPosition;
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                if (!initialized){
+                    arm.liftByEncoder(targetPosition, LIFT_SPEED);
+                    initialized = true;
+                }
+
+                if (arm.getLiftPos() != targetPosition){
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        public Action liftToTargetPosition(int targetPosition){
+            return new ArmLiftToPosition(targetPosition);
+        }
+    }
 
     public class AutoIntake {
 

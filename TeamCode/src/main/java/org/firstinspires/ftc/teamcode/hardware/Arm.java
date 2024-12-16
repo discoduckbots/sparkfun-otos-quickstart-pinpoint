@@ -12,7 +12,11 @@ public class Arm {
     public static final int LIFT_BASKET = 4500;
     public static final int LIFT_ABOVE_BAR = 2200;
     public static final int LIFT_BELOW_BAR = 2100;
-    public int LIFT_MIN = 0;
+
+    public static final int LIFT_GRAB_FROM_WALL = 100;
+
+    public static final int LIFT_RAISE_ABOVE_WALL = 200;
+    public static final int LIFT_MIN = 0;
 
     // high goal - L: -4418, R: -6302
 // above bar - L: 2134, R:4154
