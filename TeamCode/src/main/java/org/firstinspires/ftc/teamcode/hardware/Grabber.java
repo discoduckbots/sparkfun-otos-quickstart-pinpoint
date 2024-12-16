@@ -9,7 +9,7 @@ public class Grabber {
 
     private boolean intakeUp = false;
     private boolean grabberIn = true;
-    private boolean grabberOpen;
+    private boolean grabberOpen = false;
 
 
     public Grabber(Servo grabberServo, Servo grabberFlip, Servo intakeFlip){
@@ -21,33 +21,39 @@ public class Grabber {
 
     public void grab(){
         grabberServo.setPosition(1.0);
-    }
-
-    public void fancyGrab() {
-        if(intakeUp) {
-            grab();
-        }
-        else {
-            fancyGrab();
-        }
-
+        grabberOpen = false;
     }
 
     public void release(){
         grabberServo.setPosition(0.5);
+        grabberOpen = true;
     }
 
     public void flipGrabberOut(){
-        grabberFlip.setDirection(Servo.Direction.REVERSE);
-        //only if linear slide is all the way down
-        grabberFlip.setPosition(0.0);
-        grabberIn = false;
+        if (grabberIn) {
+            if (grabberOpen) {
+                grab();
+            }
+            if (!grabberOpen) {
+                grabberFlip.setDirection(Servo.Direction.REVERSE);
+                //only if linear slide is all the way down
+                grabberFlip.setPosition(0.0);
+                grabberIn = false;
+            }
+        }
     }
 
     public void flipGrabberIn(){
-        grabberFlip.setDirection(Servo.Direction.REVERSE); //test comment
-        grabberFlip.setPosition(1.0);
-        grabberIn = true;
+        if (!grabberIn) {
+            if (grabberOpen) {
+                grab();
+            }
+            if (!grabberOpen) {
+                grabberFlip.setDirection(Servo.Direction.REVERSE); //test comment
+                grabberFlip.setPosition(1.0);
+                grabberIn = true;
+            }
+        }
     }
 
     public void flipIntakeUp() {

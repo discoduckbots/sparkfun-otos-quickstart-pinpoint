@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -11,6 +13,8 @@ import org.firstinspires.ftc.teamcode.hardware.Arm;
 import org.firstinspires.ftc.teamcode.hardware.Grabber;
 import org.firstinspires.ftc.teamcode.hardware.HardwareStore;
 import org.firstinspires.ftc.teamcode.hardware.Intake;
+import org.firstinspires.ftc.teamcode.hardware.ScoringMechanism;
+
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="Duckbot Op Mode", group= "Linear Opmode")
 public class DuckbotTeleop extends LinearOpMode {
@@ -18,6 +22,7 @@ public class DuckbotTeleop extends LinearOpMode {
     Arm arm = null;
     Intake intake = null;
     Grabber grabber = null;
+    ScoringMechanism scoringMechanism = null;
     PinpointDrive drive = null;
 
     private double THROTTLE = 0.7;
@@ -27,13 +32,16 @@ public class DuckbotTeleop extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        int extendPosition = 0;
 
         HardwareStore hardwareStore = new HardwareStore(hardwareMap, telemetry, this);
         arm = hardwareStore.getArm();
         intake = hardwareStore.getIntake();
         grabber = hardwareStore.getGrabber();
+        scoringMechanism = hardwareStore.getScoringMechanism();
         drive = hardwareStore.getDrive();
-        //grabber = hardwareStore.getGrabber();
+
+        grabber.grab();
 
         waitForStart();
 
@@ -59,13 +67,15 @@ public class DuckbotTeleop extends LinearOpMode {
             }
 
             if (gamepad1.b){
-                intake.extend(EXTENSION_SPEED);
+                intake.extendByEncoder(EXTENSION_SPEED);
+                extendPosition = intake.extensionMotor.getCurrentPosition();
             }
             else if (gamepad1.a){
-                intake.retract(EXTENSION_SPEED);
+                intake.retractByEncoder(EXTENSION_SPEED);
+                extendPosition = intake.extensionMotor.getCurrentPosition();
             }
-            else{
-                intake.extendStop();
+            else {
+                intake.holdPosition(extendPosition, EXTENSION_SPEED);
             }
 
             if (gamepad2.dpad_up){
@@ -108,13 +118,16 @@ public class DuckbotTeleop extends LinearOpMode {
             }
 
             if(gamepad1.x) {
-                grabber.fancyGrab();
+                scoringMechanism.retract(0.5);
             }
 
 
             telemetry.addData("x", drive.pose.position.x);
             telemetry.addData("y", drive.pose.position.y);
             telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
+            telemetry.addData("lift_left ", arm.liftLeft.getCurrentPosition());
+            telemetry.addData("lift_right ", arm.liftRight.getCurrentPosition());
+            telemetry.addData("extention ", intake.extensionMotor.getCurrentPosition());
             telemetry.update();
 
         }

@@ -6,6 +6,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Intake {
+
+    private static final int EXTEND_OUT = -430;
+    private static final int EXTEND_IN = 0;
     public CRServo intakeLeft;
     public CRServo intakeRight;
     public DcMotor extensionMotor;
@@ -14,6 +17,8 @@ public class Intake {
         this.intakeLeft = intakeLeft;
         this.intakeRight = intakeRight;
         this.extensionMotor = extensionMotor;
+        this.extensionMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void intake(double power) {
@@ -21,7 +26,6 @@ public class Intake {
         intakeRight.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeLeft.setPower(power);
         intakeRight.setPower(power);
-
     }
 
     public void outtake(double power) {
@@ -41,13 +45,32 @@ public class Intake {
     }
 
     public void extend(double power){
+        extensionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         extensionMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         extensionMotor.setPower(power);
     }
 
     public void retract(double power){
+        extensionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         extensionMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         extensionMotor.setPower(power);
     }
 
+    public void extendByEncoder(double power){
+        extensionMotor.setTargetPosition(EXTEND_OUT);
+        extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        extensionMotor.setPower(power);
+    }
+
+    public void retractByEncoder(double power){
+        extensionMotor.setTargetPosition(EXTEND_IN);
+        extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        extensionMotor.setPower(power);
+    }
+
+    public void holdPosition(int position, double power){
+        extensionMotor.setTargetPosition(position);
+        extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        extensionMotor.setPower(power);
+    }
 }

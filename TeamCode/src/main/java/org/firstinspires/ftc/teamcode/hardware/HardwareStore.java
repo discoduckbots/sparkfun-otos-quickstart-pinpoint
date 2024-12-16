@@ -27,6 +27,7 @@ public class HardwareStore {
     public Servo grabberServo;
     public Servo intakeFlip;
     public Servo grabberFlip;
+    public ScoringMechanism scoringMechanism;
 
     public PinpointDrive drive;
 
@@ -59,6 +60,8 @@ public class HardwareStore {
 
         grabber = new Grabber(grabberServo, grabberFlip, intakeFlip);
 
+        scoringMechanism = new ScoringMechanism(arm, grabber, intake);
+
         drive = new PinpointDrive(hardwareMap, new Pose2d(0, 0, 0));
 //        autoDrive = new SparkFunOTOSDrive(hardwareMap, new Pose2d(0, 0, 0));
     }
@@ -78,8 +81,11 @@ public class HardwareStore {
     public Grabber getGrabber(){
         return grabber;
     }
+    public ScoringMechanism getScoringMechanism() {
+        return scoringMechanism;
+    }
 
-//    public SparkFunOTOSDrive getAutoDrive(){
+    //    public SparkFunOTOSDrive getAutoDrive(){
 //        return autoDrive;
 //    }
 }

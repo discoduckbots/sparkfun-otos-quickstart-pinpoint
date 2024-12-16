@@ -1,11 +1,10 @@
 package org.firstinspires.ftc.teamcode.opmode;
-import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
-import com.acmerobotics.roadrunner.Rotation2d;
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.TrajectoryBuilderParams;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -16,8 +15,8 @@ import org.firstinspires.ftc.teamcode.hardware.Grabber;
 import org.firstinspires.ftc.teamcode.hardware.HardwareStore;
 
 
-@Autonomous(name = "netPark", group = "Robot")
-public class NetPark extends LinearOpMode {
+@Autonomous(name = "redObsv", group = "Robot")
+public class RedObsv extends LinearOpMode {
     Arm arm = null;
     Grabber grabber = null;
     MecanumDrive drive = null;
@@ -32,10 +31,25 @@ public class NetPark extends LinearOpMode {
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
 
+
+
         Pose2d startPose = new Pose2d(0, 0, 0);
-        Pose2d pos2 = new Pose2d(-28, -10.7, 0);
-        Pose2d pos3 = new Pose2d(-20.1, 29.3, 0);
-        Vector2d firstMove = new Vector2d(90, 0);
+        Pose2d placePreloadPos = new Pose2d(-28, -10.7, 0);
+        Pose2d backFromChamberPos = new Pose2d(-20.1, 29.3, 0);
+        Pose2d pushSample1Pos = new Pose2d(-28, -10.7, 0); //has a 180 turn
+        Pose2d obsvZone1Pos = new Pose2d(-28, -10.7, 0);
+        Pose2d nextToSample2Pos = new Pose2d(-28, -10.7, 0);
+        Pose2d pushSample2Pos = new Pose2d(-28, -10.7, 0);
+        Pose2d obsvZone2Pos = new Pose2d(-28, -10.7, 0);
+        Pose2d nextToSample3Pos = new Pose2d(-28, -10.7, 0);
+        Pose2d pushSample3Pos = new Pose2d(-28, -10.7, 0);
+        Pose2d obsvZone3Pos = new Pose2d(-28, -10.7, 0);
+        Pose2d wallPos = new Pose2d(-28, -10.7, 0);
+        Pose2d frontOfChamberPos = new Pose2d(-28, -10.7, 0);
+        Pose2d atChamberPos = new Pose2d(-28, -10.7, 0);
+
+        //TrajectoryActionBuilder placePreload = drive.actionBuilder(startPose)
+                       // .splineToLinearHeading(placePreloadPos);
 
 
         waitForStart();
