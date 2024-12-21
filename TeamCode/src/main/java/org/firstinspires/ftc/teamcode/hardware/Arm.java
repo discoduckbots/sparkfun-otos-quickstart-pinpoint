@@ -12,7 +12,6 @@ public class Arm {
     public static final int LIFT_BASKET = 4500;
     public static final int LIFT_ABOVE_BAR = 2200;
     public static final int LIFT_BELOW_BAR = 2100;
-
     public static final int LIFT_GRAB_FROM_WALL = 100;
 
     public static final int LIFT_RAISE_ABOVE_WALL = 200;
