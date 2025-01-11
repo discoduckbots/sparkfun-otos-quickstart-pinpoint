@@ -16,9 +16,8 @@ public abstract class DuckbotAuto extends LinearOpMode {
 
     private static final double INTAKE_TIME = 1.5;
     private static final double INTAKE_SPEED = 1.0;
-
-    private static final double LIFT_SPEED = 0.5;
-
+    private static final double LIFT_SPEED = 1.0;
+    private static final double EXTENSION_SPEED = 0.3;
     public class AutoArm {
         private Arm arm;
 
@@ -52,8 +51,29 @@ public abstract class DuckbotAuto extends LinearOpMode {
             }
         }
 
+        public class LowerToZero implements Action {
+
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                if (!initialized) {
+                    initialized = true;
+                    resetRuntime();
+                    arm.lowerByTouch(LIFT_SPEED);
+                }
+
+                return false;
+            }
+        }
+
+
         public Action liftToTargetPosition(int targetPosition){
             return new ArmLiftToPosition(targetPosition);
+        }
+
+        public Action lowerToZero(){
+            return new LowerToZero();
         }
     }
 
@@ -76,12 +96,25 @@ public abstract class DuckbotAuto extends LinearOpMode {
                     intake.intake(INTAKE_SPEED);
                 }
 
-                if (getRuntime()-startTime < INTAKE_TIME){
+                /*if (getRuntime()-startTime < INTAKE_TIME){
                     return true;
                 }
 
-                intake.stop();
+                intake.stop(); */
                 return  false;
+            }
+        }
+
+        public class StopIntake implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                if (!initialized) {
+                    initialized = true;
+                    intake.stop();
+                }
+                return false;
             }
         }
 
@@ -105,12 +138,57 @@ public abstract class DuckbotAuto extends LinearOpMode {
             }
         }
 
+        public class Extend implements Action {
+
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                if (!initialized) {
+                    initialized = true;
+                    resetRuntime();
+                    intake.extendLittleByEncoder(EXTENSION_SPEED);
+                }
+
+                return false;
+            }
+        }
+
+        public class Retract implements Action {
+
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                if (!initialized) {
+                    initialized = true;
+                    resetRuntime();
+                    intake.retractByEncoder(EXTENSION_SPEED);
+                }
+
+                return false;
+            }
+        }
+
+
         public Action intakeIn(){
             return new IntakeIn();
         }
 
         public Action intakeOut(){
             return  new IntakeOut();
+        }
+
+        public Action stopIntake(){
+            return new StopIntake();
+        }
+
+        public Action extend(){
+            return new Extend();
+        }
+
+        public Action retract(){
+            return new Retract();
         }
     }
 
@@ -205,6 +283,19 @@ public abstract class DuckbotAuto extends LinearOpMode {
             }
         }
 
+        public class GrabberMiddle implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                if (!initialized) {
+                    initialized = true;
+                    grabber.flipGrabberMiddle();
+                }
+                return  false;
+            }
+        }
+
         public Action grabberGrab(){
             return new GrabberGrab();
         }
@@ -219,6 +310,10 @@ public abstract class DuckbotAuto extends LinearOpMode {
 
         public Action grabberOut(){
             return new GrabberOut();
+        }
+
+        public Action grabberMiddle(){
+            return new GrabberMiddle();
         }
 
         public Action intakeUp(){

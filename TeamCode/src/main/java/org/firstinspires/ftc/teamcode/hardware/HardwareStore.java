@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.PinpointDrive;
@@ -27,6 +28,8 @@ public class HardwareStore {
     public Servo grabberServo;
     public Servo intakeFlip;
     public Servo grabberFlip;
+    public TouchSensor leftLimitSwitch;
+    public TouchSensor rightLimitSwitch;
     public ScoringMechanism scoringMechanism;
 
     public PinpointDrive drive;
@@ -44,8 +47,10 @@ public class HardwareStore {
 
         liftRight = hardwareMap.get(DcMotor.class, "liftRight");
         liftRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftLimitSwitch = hardwareMap.get(TouchSensor.class, "leftLimitSwitch");
+        rightLimitSwitch = hardwareMap.get(TouchSensor.class, "rightLimitSwitch");
 
-        arm = new Arm(liftLeft, liftRight);
+        arm = new Arm(liftLeft, liftRight, leftLimitSwitch, rightLimitSwitch);
 
         intakeLeft = hardwareMap.get(CRServo.class, "intakeLeft");
         intakeRight = hardwareMap.get(CRServo.class, "intakeRight");

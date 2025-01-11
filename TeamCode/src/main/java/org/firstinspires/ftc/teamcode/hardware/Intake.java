@@ -7,11 +7,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Intake {
 
-    private static final int EXTEND_OUT = -430;
+    private static final int EXTEND_OUT = 430;
+    private static final int EXTEND_LITTLE = 100;
     private static final int EXTEND_IN = 0;
     public CRServo intakeLeft;
     public CRServo intakeRight;
     public DcMotor extensionMotor;
+
 
     public Intake(CRServo intakeLeft, CRServo intakeRight, DcMotor extensionMotor) {
         this.intakeLeft = intakeLeft;
@@ -40,6 +42,9 @@ public class Intake {
         intakeRight.setPower(0);
     }
 
+    public int getExtensionPos() {
+        return extensionMotor.getCurrentPosition();
+    }
     public void extendStop(){
         extensionMotor.setPower(0);
     }
@@ -58,6 +63,12 @@ public class Intake {
 
     public void extendByEncoder(double power){
         extensionMotor.setTargetPosition(EXTEND_OUT);
+        extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        extensionMotor.setPower(power);
+    }
+
+    public void extendLittleByEncoder(double power){
+        extensionMotor.setTargetPosition(EXTEND_LITTLE);
         extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         extensionMotor.setPower(power);
     }
