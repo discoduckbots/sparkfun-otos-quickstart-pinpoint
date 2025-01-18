@@ -38,7 +38,7 @@ public class RedNetAuto extends DuckbotAuto {
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
 
-        teleGrabber.grab();
+        teleGrabber.closeGrabber();
 
         waitForStart();
         TranslationalVelConstraint slowVel = new TranslationalVelConstraint(15.0);
@@ -101,21 +101,17 @@ public class RedNetAuto extends DuckbotAuto {
                             grabber.grabberIn(),
                             new ParallelAction(
                                     arm.liftToTargetPosition(0),
-                                    grabber.intakeDown(),
-                                    intake.intakeIn()
+                                    intake.intakeDown()
                                     ),
                             new ParallelAction(
-                                    driveToFirstGrabPos.build()
+                                    driveToFirstGrabPos.build() // will need to alter the grab pos to be more accurate
                                 ),
-                            intake.stopIntake(),
-                            intake.extend(),
-                            new SleepAction(0.5),
-                            grabber.intakeUp(), // I don't know if this is too much stuff to put into one action/sequence, final 2 (now 3) actions could probably be separated
-                            new SleepAction(2.0),
+                            intake.intakeClose(),
+                            intake.intakeUp(),
                             intake.retract(),
-                            new SleepAction(2.0),
+                            new SleepAction(1.0),
                             grabber.grabberGrab(),
-                            new SleepAction(2.0)
+                            new SleepAction(0.5)
                     )
             );
 
@@ -123,14 +119,97 @@ public class RedNetAuto extends DuckbotAuto {
                     new ParallelAction(
                             scoreFirstSample.build(),
                             new SequentialAction(
-                                    grabber.intakeDown(),
+                                    intake.intakeOpen(), //might need wait in between
+                                    intake.intakeDown(),
                                     arm.liftToTargetPosition(Arm.LIFT_BASKET),
                                     grabber.grabberOut(),
                                     new SleepAction(1.0),
-                                    grabber.grabberRelease()
+                                    grabber.grabberRelease(),
+                                    new SleepAction(0.5)
                             )
                     )
             );
+
+            Actions.runBlocking(
+                    new SequentialAction(
+                            grabber.grabberIn(),
+                            new ParallelAction(
+                                    arm.liftToTargetPosition(0),
+                                    intake.intakeDown()
+                            ),
+                            new ParallelAction(
+                                    driveToSecondGrabPosition.build() // will need to alter the grab pos to be more accurate
+                            ),
+                            intake.intakeClose(),
+                            intake.intakeUp(),
+                            intake.retract(),
+                            new SleepAction(1.0),
+                            grabber.grabberGrab(),
+                            new SleepAction(0.5)
+                    )
+            );
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            scoreSecondSample.build(),
+                            new SequentialAction(
+                                    intake.intakeOpen(), //might need wait in between
+                                    intake.intakeDown(),
+                                    arm.liftToTargetPosition(Arm.LIFT_BASKET),
+                                    grabber.grabberOut(),
+                                    new SleepAction(1.0),
+                                    grabber.grabberRelease(),
+                                    new SleepAction(0.5)
+                            )
+                    )
+            );
+
+            Actions.runBlocking(
+                    new SequentialAction(
+                            grabber.grabberIn(),
+                            new ParallelAction(
+                                    arm.liftToTargetPosition(0),
+                                    intake.intakeDown()
+                            ),
+                            new ParallelAction(
+                                    driveToThirdGrabPosition.build() // will need to alter the grab pos to be more accurate
+                            ),
+                            intake.intakeClose(),
+                            intake.intakeUp(),
+                            intake.retract(),
+                            new SleepAction(1.0),
+                            grabber.grabberGrab(),
+                            new SleepAction(0.5)
+                    )
+            );
+
+            Actions.runBlocking(
+                    new ParallelAction(
+                            scoreThirdSample.build(),
+                            new SequentialAction(
+                                    intake.intakeOpen(), //might need wait in between
+                                    intake.intakeDown(),
+                                    arm.liftToTargetPosition(Arm.LIFT_BASKET),
+                                    grabber.grabberOut(),
+                                    new SleepAction(1.0),
+                                    grabber.grabberRelease(),
+                                    new SleepAction(0.5)
+                            )
+                    )
+            );
+
+            Actions.runBlocking(
+                    new SequentialAction(
+                            new ParallelAction(
+                                    driveToPark.build(),
+                                    arm.liftToTargetPosition(Arm.LIFT_ABOVE_LOW_BAR)
+                            ),
+                            arm.liftToTargetPosition(Arm.LIFT_TOUCH_LOW_BAR)
+                    )
+            );
+
+
+
 /*
             Actions.runBlocking(
                     new SequentialAction(
@@ -166,6 +245,13 @@ public class RedNetAuto extends DuckbotAuto {
             );
 
             Actions.runBlocking(
+                    new SequentialAction(
+                            grabber.grabberRelease(),
+                            new SleepAction(0.5),
+                            arm.liftToTargetPosition(0)
+                    )
+            );
+            /*Actions.runBlocking(
                     new SequentialAction(
                             grabber.grabberRelease(),
                             new ParallelAction(

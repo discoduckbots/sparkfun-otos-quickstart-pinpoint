@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 public class ScoringMechanism {
@@ -14,7 +12,7 @@ public class ScoringMechanism {
         this.grabber = grabber;
         this.intake = intake;
     }
-
+/*
     private void retractAndGrabberIn(double retractPower) {
         grabber.flipGrabberIn();
         intake.retractByEncoder(retractPower);
@@ -27,7 +25,7 @@ public class ScoringMechanism {
         }
         if (grabber.isGrabberIn() && intake.getExtensionPos() < 1) {
             arm.liftByEncoder(0, liftPower);
-            grabber.release();
+            grabber.openGrabber();
         }
     }
     private void linkedIntakeUp(double liftPower, double retractPower) {
@@ -44,7 +42,7 @@ public class ScoringMechanism {
             linkedIntakeUp(liftPower, retractPower);
         }
         if (grabber.isIntakeUp()) {
-            grabber.grab();
+            grabber.closeGrabber();
         }
     }
 

@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.teamcode.hardware.Arm;
 import org.firstinspires.ftc.teamcode.hardware.Grabber;
@@ -85,7 +84,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
             intake = hardwareStore.getIntake();
         }
 
-        public class IntakeIn implements Action {
+        public class IntakeClose implements Action {
             private boolean initialized = false;
             private double startTime = getRuntime();
 
@@ -93,7 +92,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 if (!initialized) {
                     initialized = true;
-                    intake.intake(INTAKE_SPEED);
+                    intake.closeIntake();
                 }
 
                 /*if (getRuntime()-startTime < INTAKE_TIME){
@@ -105,35 +104,41 @@ public abstract class DuckbotAuto extends LinearOpMode {
             }
         }
 
-        public class StopIntake implements Action {
+        public class IntakeOpen implements Action {
             private boolean initialized = false;
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 if (!initialized) {
                     initialized = true;
-                    intake.stop();
+                    intake.openIntake();
                 }
                 return false;
             }
         }
 
-        public class IntakeOut implements Action {
+        public class IntakeUp implements Action {
             private boolean initialized = false;
-            private double startTime = getRuntime();
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 if (!initialized) {
                     initialized = true;
-                    intake.outtake(INTAKE_SPEED);
+                    intake.flipIntakeUp();
                 }
+                return  false;
+            }
+        }
 
-                if (getRuntime()-startTime < INTAKE_TIME){
-                    return true;
+        public class IntakeDown implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                if (!initialized) {
+                    initialized = true;
+                    intake.flipIntakeDown();
                 }
-
-                intake.stop();
                 return  false;
             }
         }
@@ -171,16 +176,21 @@ public abstract class DuckbotAuto extends LinearOpMode {
         }
 
 
-        public Action intakeIn(){
-            return new IntakeIn();
+        public Action intakeClose(){
+            return new IntakeClose();
         }
 
-        public Action intakeOut(){
-            return  new IntakeOut();
+
+        public Action intakeOpen(){
+            return new IntakeOpen();
         }
 
-        public Action stopIntake(){
-            return new StopIntake();
+        public Action intakeUp(){
+            return new IntakeUp();
+        }
+
+        public Action intakeDown(){
+            return new IntakeDown();
         }
 
         public Action extend(){
@@ -208,7 +218,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
                 if (!initialized) {
                     initialized = true;
                     resetRuntime();
-                    grabber.grab();
+                    grabber.closeGrabber();
                 }
 
                 return false;
@@ -224,36 +234,10 @@ public abstract class DuckbotAuto extends LinearOpMode {
                 if (!initialized) {
                     initialized = true;
                     resetRuntime();
-                    grabber.release();
+                    grabber.openGrabber();
                 }
 
                 return false;
-            }
-        }
-
-        public class IntakeUp implements Action {
-            private boolean initialized = false;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                if (!initialized) {
-                    initialized = true;
-                    grabber.flipIntakeUp();
-                }
-                return  false;
-            }
-        }
-
-        public class IntakeDown implements Action {
-            private boolean initialized = false;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                if (!initialized) {
-                    initialized = true;
-                    grabber.flipIntakeDown();
-                }
-                return  false;
             }
         }
 
@@ -316,12 +300,5 @@ public abstract class DuckbotAuto extends LinearOpMode {
             return new GrabberMiddle();
         }
 
-        public Action intakeUp(){
-            return new IntakeUp();
-        }
-
-        public Action intakeDown(){
-            return new IntakeDown();
-        }
     }
 }

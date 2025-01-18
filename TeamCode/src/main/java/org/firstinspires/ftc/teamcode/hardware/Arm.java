@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.hardware;
 import android.util.Log;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 public class Arm {
@@ -15,10 +14,10 @@ public class Arm {
     public static final int LIFT_MAX = 4670;
     public static final int LIFT_BASKET = 4200;
     public static final int LIFT_ABOVE_BAR = 1750;
-    public static final int LIFT_HIGHER_ABOVE_BAR = 1800;
+    public static final int LIFT_PLACE_SPECIMEN = 1800;
     public static final int LIFT_BELOW_BAR = 1600;
-    public static final int LIFT_GRAB_FROM_WALL = 0;
-    public static final int LIFT_RAISE_ABOVE_WALL = 50;
+    public static final int LIFT_GRAB_FROM_WALL = 80;
+    public static final int LIFT_RAISE_ABOVE_WALL = 120;
     public static final int LIFT_TOUCH_LOW_BAR = 1250;
     public static final int LIFT_ABOVE_LOW_BAR = 1400;
     public static final int LIFT_MIN = 0;
@@ -30,12 +29,12 @@ public class Arm {
     public Arm(DcMotor liftMotor1, DcMotor liftMotor2, TouchSensor leftLimitSwitch, TouchSensor rightLimitSwitch) {
 
         this.liftLeft = liftMotor1;
-        this.liftLeft.setDirection(DcMotor.Direction.REVERSE);
+        this.liftLeft.setDirection(DcMotor.Direction.FORWARD);
         this.liftLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.liftLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         this.liftRight = liftMotor2;
-        this.liftRight.setDirection(DcMotor.Direction.FORWARD);
+        this.liftRight.setDirection(DcMotor.Direction.REVERSE);
         this.liftRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.liftRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -52,8 +51,8 @@ public class Arm {
     }
 
     public void lift(double power) {
-        liftLeft.setDirection(DcMotor.Direction.REVERSE);
-        liftRight.setDirection(DcMotor.Direction.FORWARD);
+        liftLeft.setDirection(DcMotor.Direction.FORWARD);
+        liftRight.setDirection(DcMotor.Direction.REVERSE);
         liftLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftLeft.setPower(power);
@@ -64,8 +63,8 @@ public class Arm {
 
     public void lower(double power) {
         if (!leftLimitSwitch.isPressed() && !rightLimitSwitch.isPressed()) {
-            liftLeft.setDirection(DcMotor.Direction.FORWARD);
-            liftRight.setDirection(DcMotor.Direction.REVERSE);
+            liftLeft.setDirection(DcMotor.Direction.REVERSE);
+            liftRight.setDirection(DcMotor.Direction.FORWARD);
             liftLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             liftRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             liftLeft.setPower(power);

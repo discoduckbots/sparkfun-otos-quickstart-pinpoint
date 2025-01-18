@@ -1,12 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.PinpointDrive;
@@ -32,6 +28,10 @@ public class DuckbotTeleop extends LinearOpMode {
     private double LIFT_SPEED = 1.0;
     private double LOWER_SPEED = 0.7;
     private double EXTENSION_SPEED = 0.7;
+    private boolean intakeGrabberPressed = false;
+    private boolean intakeFlipPressed = false;
+    private boolean grabberPressed = false;
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -48,7 +48,8 @@ public class DuckbotTeleop extends LinearOpMode {
         //grabber.grab();
 
         waitForStart();
-        grabber.flipIntakeDown();
+        //intake.flipIntakeDown();
+        intake.rotateIntakeTo0();
 
         boolean inGrabPosition = false;
 
@@ -63,14 +64,12 @@ public class DuckbotTeleop extends LinearOpMode {
 
             drive.updatePoseEstimate();
 
-            if (gamepad1.right_trigger > 0.25){
-                intake.intake(gamepad1.right_trigger);
+            if (gamepad1.right_trigger > 0.1){
+                intake.openIntake();
             }
-            else if (gamepad1.left_trigger > 0.25){
-                intake.outtake(gamepad1.left_trigger);
-            }
-            else{
-                intake.stop();
+
+            if (gamepad1.left_trigger > 0.1){
+                intake.closeIntake();
             }
 
             if (gamepad1.right_bumper){
@@ -85,10 +84,14 @@ public class DuckbotTeleop extends LinearOpMode {
 
 
             if (gamepad1.x) {
-                grabber.flipIntakeDown();
+                intake.flipIntakeDown();
+                telemetry.addData("trying to flip down", intake.intakeFlip.getPosition());
+                telemetry.update();
             }
             if (gamepad1.y) {
-                grabber.flipIntakeUp();
+                intake.flipIntakeUp();
+                telemetry.addData("trying to flip up", intake.intakeFlip.getPosition());
+                telemetry.update();
             }
 
             if (gamepad2.dpad_up){
@@ -101,19 +104,44 @@ public class DuckbotTeleop extends LinearOpMode {
                 arm.liftByEncoder(arm.getLiftPos(), LOWER_SPEED);
             }
 
-            if (gamepad2.left_trigger > 0.25) {
-                arm.liftByEncoder(Arm.LIFT_ABOVE_BAR, LIFT_SPEED);
+            //boolean test code - need to remove or implement
+            /*if (gamepad1.a && !grabberPressed) {
+                grabber.booleanGrabber();
+                grabberPressed = true;
+            }
+            else {
+                grabberPressed = false;
             }
 
-            if (gamepad2.right_trigger > 0.25) {
-                arm.liftByEncoder(Arm.LIFT_BASKET, LIFT_SPEED);
+            if (gamepad1.b && !intakeGrabberPressed) {
+                intake.booleanIntakeGrabber();
+                intakeGrabberPressed = true;
             }
+            else {
+                intakeGrabberPressed = false;
+            }
+
+            if (gamepad1.back && !intakeFlipPressed) {
+                intake.booleanFlipIntake();
+                intakeFlipPressed = true;
+            }
+            else {
+                intakeFlipPressed = false;
+            }*/
+            //end of test code - if works need to change buttons + add intakeFlip
 
             if (gamepad2.left_bumper){
-                grabber.grab();
+                grabber.closeGrabber();
             }
             else if (gamepad2.right_bumper){
-                grabber.release();
+                grabber.openGrabber();
+            }
+
+            if (gamepad2.left_trigger > 0.25) {
+                intake.closeIntake();
+            }
+            else if (gamepad2.right_trigger > 0.25) {
+                intake.openIntake();
             }
 
             if (gamepad2.a) {
@@ -123,6 +151,10 @@ public class DuckbotTeleop extends LinearOpMode {
                 grabber.flipGrabberIn();
             }
 
+            if (gamepad2.x) {
+                arm.liftByEncoder(Arm.LIFT_GRAB_FROM_WALL, LIFT_SPEED);
+            }
+
             /*if(gamepad2.x) {
                 grabber.flipIntakeDown();
             }
@@ -130,30 +162,32 @@ public class DuckbotTeleop extends LinearOpMode {
                 grabber.flipIntakeUp();
             } */
 
-            if (gamepad2.y) {
-                grabber.flipIntakeDown();
-            }
+            /*if (gamepad2.y) {
+                grabber.flipGrabberMiddle();
+                //intake.flipIntakeDown(); need to put back
+            } /*
 
             /*if (gamepad2.x) {
                 grabber.flipIntakeUp();
             } */
-
+/*
             if (gamepad2.x && !inGrabPosition) {
                 inGrabPosition = true;
                 //intake.extendByEncoder(EXTENSION_SPEED);
                 grabber.flipGrabberIn();
-                grabber.release();
-                grabber.flipIntakeUp();
+                grabber.openGrabber();
+                intake.flipIntakeUp();
                 arm.liftByEncoder(Arm.LIFT_MIN, LIFT_SPEED);
                 sleep(250);
                 intake.retractByEncoder(EXTENSION_SPEED);
                 sleep(500);
-                grabber.grab();
+                grabber.closeGrabber();
                 sleep(250);
-                grabber.flipIntakeDown();
+                intake.openIntake();
+                intake.flipIntakeDown();
 //                scoringMechanism.grabFromIntake(EXTENSION_SPEED, ARM_SPEED, this);
                 inGrabPosition = false;
-            }
+            } */
 
 
 

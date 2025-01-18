@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.hardware;
 
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -22,11 +21,11 @@ public class HardwareStore {
     public DcMotor liftRight;
     public DcMotor extensionMotor;
     public Intake intake;
-    public CRServo intakeLeft;
-    public CRServo intakeRight;
+    public Servo intakeGrab;
+    public Servo intakeRotate;
+    public Servo intakeFlip;
     public Grabber grabber;
     public Servo grabberServo;
-    public Servo intakeFlip;
     public Servo grabberFlip;
     public TouchSensor leftLimitSwitch;
     public TouchSensor rightLimitSwitch;
@@ -52,18 +51,18 @@ public class HardwareStore {
 
         arm = new Arm(liftLeft, liftRight, leftLimitSwitch, rightLimitSwitch);
 
-        intakeLeft = hardwareMap.get(CRServo.class, "intakeLeft");
-        intakeRight = hardwareMap.get(CRServo.class, "intakeRight");
+        intakeGrab = hardwareMap.get(Servo.class, "intakeGrabber");
+        intakeRotate = hardwareMap.get(Servo.class, "intakeRotate");
         extensionMotor = hardwareMap.get(DcMotor.class, "extension");
+        intakeFlip = hardwareMap.get(Servo.class, "intakeFlip");
         extensionMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        intake = new Intake(intakeLeft, intakeRight, extensionMotor);
+        intake = new Intake(intakeGrab, intakeRotate, intakeFlip, extensionMotor);
 
         grabberServo = hardwareMap.get(Servo.class, "grabberServo");
         grabberFlip = hardwareMap.get(Servo.class, "grabberFlip");
-        intakeFlip = hardwareMap.get(Servo.class, "intakeFlip");
 
-        grabber = new Grabber(grabberServo, grabberFlip, intakeFlip);
+        grabber = new Grabber(grabberServo, grabberFlip);
 
         scoringMechanism = new ScoringMechanism(arm, grabber, intake);
 

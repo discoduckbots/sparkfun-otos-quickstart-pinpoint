@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
+import com.acmerobotics.roadrunner.Trajectory;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -38,45 +38,49 @@ public class RedObsvAuto extends DuckbotAuto {
 
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
-        teleGrabber.grab();
+        teleGrabber.closeGrabber();
 
         waitForStart();
         TranslationalVelConstraint slowVel = new TranslationalVelConstraint(15.0);
         ProfileAccelConstraint slowAccel = new ProfileAccelConstraint(-10, 10);
         Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(0));
         Pose2d scoringPose = new Pose2d(-29, -14.5, Math.toRadians(0));
-        Vector2d grabPose = new Vector2d(-5, 20);
-        Vector2d closeGrabPose = new Vector2d(-1, 20);
-        Vector2d awayFromWallPose = new Vector2d(-5, 21.5);
+        Vector2d grabPose = new Vector2d(-15, 20);
+        Vector2d closeGrabPose = new Vector2d(-12, 20);
+        Vector2d awayFromWallPose = new Vector2d(-15, 21.5);
 
 
         TrajectoryActionBuilder driveToBar = drive.actionBuilder(initialPose)
                // .splineToLinearHeading(scoringPose, Math.toRadians(180), slowVel, slowAccel);
-                .strafeTo(new Vector2d(-29, -14.5));
+                .strafeTo(new Vector2d(-29, -14.5)); // move to bar
 
-        TrajectoryActionBuilder pushSamplesToObsZone = driveToBar.endTrajectory().fresh()
-                .strafeTo(new Vector2d(-10, 15))//backup a little
-                .strafeToLinearHeading(new Vector2d(-54, 30), Math.toRadians(-180))
-                .strafeTo(new Vector2d(-54, 26.5)) //position for first sample
-                .strafeTo(new Vector2d(-3, 25)) //push first sample back
-                .strafeTo(new Vector2d(-12, 25)); //little forward
+        TrajectoryActionBuilder ramBar = driveToBar.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-35, -14.5)); // arbitrary x value needs tuning - ram bar
+
+        TrajectoryActionBuilder pushSamplesToObsZone = ramBar.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-25, 15))//backup a little
+                .strafeToLinearHeading(new Vector2d(-54, 23), Math.toRadians(-180))
+                .strafeTo(new Vector2d(-12, 23)); //push first sample back
                 //.strafeTo(new Vector2d(-54, 37)) //position for second sample
                 //.strafeTo(new Vector2d(-3, 37)) //push second sample back
                 //.strafeTo(new Vector2d(-54, 42.5))//position for third sample
                 //.strafeTo(new Vector2d(-3, 42.5)) //push third sample back
 
-        TrajectoryActionBuilder firstMoveToWall = pushSamplesToObsZone.endTrajectory().fresh()
-                .strafeTo(grabPose);
+        //TrajectoryActionBuilder firstMoveToWall = pushSamplesToObsZone.endTrajectory().fresh()
+        //        .strafeTo(grabPose);
 
-        TrajectoryActionBuilder pickupFirstSample = firstMoveToWall.endTrajectory().fresh()
-                .strafeTo(closeGrabPose);
+        //TrajectoryActionBuilder pickupFirstSample = firstMoveToWall.endTrajectory().fresh()
+        //        .strafeTo(closeGrabPose);
 
-        TrajectoryActionBuilder deliverFirstSample = pickupFirstSample.endTrajectory().fresh()
+        TrajectoryActionBuilder deliverFirstSample = pushSamplesToObsZone.endTrajectory().fresh()
                 .strafeTo(awayFromWallPose) //back away from wall
                 .strafeToLinearHeading(new Vector2d(-27, -8.5), Math.toRadians(0))
                 .strafeTo(new Vector2d(-29, -8.5));
 
-        TrajectoryActionBuilder secondMoveToWall = deliverFirstSample.endTrajectory().fresh()
+        TrajectoryActionBuilder firstRamWall = deliverFirstSample.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-35, -8.5)); // needs to be tuned/tested
+
+        TrajectoryActionBuilder secondMoveToWall = firstRamWall.endTrajectory().fresh()
                 .strafeToLinearHeading(grabPose, Math.toRadians(-180));
 
         TrajectoryActionBuilder pickupSecondSample = secondMoveToWall.endTrajectory().fresh()
@@ -87,7 +91,10 @@ public class RedObsvAuto extends DuckbotAuto {
                 .strafeToLinearHeading(new Vector2d(-27, -4), Math.toRadians(0))
                 .strafeTo(new Vector2d(-29, -4));
 
-        TrajectoryActionBuilder thirdMoveToWall = deliverSecondSample.endTrajectory().fresh()
+        TrajectoryActionBuilder secondRamWall = deliverSecondSample.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-35, -4)); // needs to be tuned/tested
+
+        TrajectoryActionBuilder thirdMoveToWall = secondRamWall.endTrajectory().fresh()
                 .strafeToLinearHeading(grabPose, Math.toRadians(-180));
 
         TrajectoryActionBuilder pickupThirdSample = thirdMoveToWall.endTrajectory().fresh()
@@ -98,45 +105,53 @@ public class RedObsvAuto extends DuckbotAuto {
                 .strafeToLinearHeading(new Vector2d(-27, -0.5), Math.toRadians(0))
                 .strafeTo(new Vector2d(-29, -0.5));
 
+        TrajectoryActionBuilder thirdRamWall = deliverThirdSample.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-33, -0.5)); // needs to be tuned/tested
+
 
         if (opModeIsActive()) {
             if (isStopRequested()) return;
-
             Actions.runBlocking(
                     new SequentialAction(
                             grabber.grabberGrab(),
-                            //grabber.grabberOut(),
+                            new SleepAction(0.05),
+                            grabber.grabberOut(),
+                            new SleepAction(0.1),
                         new ParallelAction(
                                 intake.retract(),
                                 driveToBar.build(),
-                                grabber.grabberOut(),
-                                arm.liftToTargetPosition(Arm.LIFT_HIGHER_ABOVE_BAR)
+                                arm.liftToTargetPosition(Arm.LIFT_PLACE_SPECIMEN)
                                 )
                         )
             );
 
             Actions.runBlocking(
-                    new ParallelAction(
-                            intake.retract(),
-                        new SequentialAction(
-                                //grabber.grabberOut(),
-                                new SleepAction(0.2),
-                                arm.liftToTargetPosition(Arm.LIFT_BELOW_BAR),
-                                new SleepAction(0.1),
-                                grabber.grabberRelease()
-                        )
+                    new SequentialAction(
+                            new SleepAction(0.2),
+                            ramBar.build(),
+                            new SleepAction(0.2),
+                            grabber.grabberRelease()
+                            // SleepAction(0.5)
                     )
             );
 
             Actions.runBlocking(
                     new ParallelAction(
                             intake.retract(),
-                            grabber.grabberGrab(),
+                            //grabber.grabberGrab(),
                             arm.liftToTargetPosition(Arm.LIFT_GRAB_FROM_WALL),
                             pushSamplesToObsZone.build()
                     )
             );
 
+            Actions.runBlocking(
+                    new SequentialAction(
+                            grabber.grabberGrab(),
+                            new SleepAction(0.2),
+                            arm.liftToTargetPosition(Arm.LIFT_RAISE_ABOVE_WALL)
+                    )
+            );
+/*
             Actions.runBlocking(
                     new ParallelAction(
                             intake.retract(),
@@ -161,20 +176,22 @@ public class RedObsvAuto extends DuckbotAuto {
                             )
                     )
             );
-
+            */
             Actions.runBlocking(
                     new ParallelAction(
                             intake.retract(),
                             deliverFirstSample.build(),
-                            arm.liftToTargetPosition(Arm.LIFT_HIGHER_ABOVE_BAR)
+                            arm.liftToTargetPosition(Arm.LIFT_PLACE_SPECIMEN),
+                            grabber.grabberOut()
                     )
             );
 
             Actions.runBlocking(
                     new SequentialAction(
+                            firstRamWall.build(),
                             new SleepAction(0.2),
-                            arm.liftToTargetPosition(Arm.LIFT_BELOW_BAR),
-                            grabber.grabberRelease()
+                            grabber.grabberRelease(),
+                            new SleepAction(0.2)
                     )
             );
 
@@ -183,12 +200,10 @@ public class RedObsvAuto extends DuckbotAuto {
                             intake.retract(),
                             secondMoveToWall.build(),
                              new SequentialAction(
-                                     grabber.grabberGrab(),
                                      arm.liftToTargetPosition(Arm.LIFT_GRAB_FROM_WALL),
                                      new SleepAction(0.2),
                                      grabber.grabberOut(),
-                                     new SleepAction(0.2),
-                                     grabber.grabberRelease()
+                                     new SleepAction(0.2)
                              )
                     )
             );
@@ -210,14 +225,17 @@ public class RedObsvAuto extends DuckbotAuto {
                     new ParallelAction(
                             intake.retract(),
                             deliverSecondSample.build(),
-                            arm.liftToTargetPosition(Arm.LIFT_HIGHER_ABOVE_BAR)
+                            arm.liftToTargetPosition(Arm.LIFT_PLACE_SPECIMEN),
+                            grabber.grabberOut()
                     )
             );
 
             Actions.runBlocking(
                     new SequentialAction(
-                            arm.liftToTargetPosition(Arm.LIFT_BELOW_BAR),
-                            grabber.grabberRelease()
+                            secondRamWall.build(),
+                            new SleepAction(0.2),
+                            grabber.grabberRelease(),
+                            new SleepAction(0.2)
                     )
             );
 /*
@@ -229,4 +247,5 @@ public class RedObsvAuto extends DuckbotAuto {
             ); */
 
         }
-    }}
+    }
+}

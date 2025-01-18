@@ -5,57 +5,68 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Grabber {
     Servo grabberServo = null;
     Servo grabberFlip = null;
-    Servo intakeFlip = null;
 
-    private boolean intakeUp = false;
+    private static final double GRABBER_OPEN_POS = 0;
+    private static final double GRABBER_CLOSE_POS = 0.59;
+    private static final double GRABBER_IN_POS = 0.01;
+    private static final double GRABBER_OUT_POS = 1;
+    private static final double GRABBER_MID_POS = 0.6; //needs to be tested / adjusted
     private boolean grabberIn;
     private boolean grabberOut;
     private boolean grabberMid;
     private boolean grabberOpen = false;
 
 
-    public Grabber(Servo grabberServo, Servo grabberFlip, Servo intakeFlip){
+    public Grabber(Servo grabberServo, Servo grabberFlip) {
 
         this.grabberServo = grabberServo;
         this.grabberFlip = grabberFlip;
-        this.intakeFlip = intakeFlip;
     }
 
-    public void grab(){
-        grabberServo.setPosition(0.5);
+    public void closeGrabber() {
+        grabberServo.setPosition(GRABBER_CLOSE_POS);
         grabberOpen = false;
     }
 
-    public void release(){
-        grabberServo.setPosition(0);
+    public void openGrabber() {
+        grabberServo.setPosition(GRABBER_OPEN_POS);
         grabberOpen = true;
+    }
+
+    public void booleanGrabber() {
+        if (grabberOpen) {
+            closeGrabber();
+        }
+        else {
+            openGrabber();
+        }
     }
 
     public boolean isGrabberOpen() {
         return grabberOpen;
     }
 
-    public void flipGrabberOut(){
+    public void flipGrabberOut() {
         if (grabberOpen) {
-            grab();
+            closeGrabber();
         }
         if (!grabberOpen) {
-            grabberFlip.setDirection(Servo.Direction.REVERSE);
+            //grabberFlip.setDirection(Servo.Direction.REVERSE);
             //only if linear slide is all the way down
-            grabberFlip.setPosition(0.0);
+            grabberFlip.setPosition(GRABBER_OUT_POS);
             grabberOut = true;
             grabberIn = false;
             grabberMid = false;
         }
     }
 
-    public void flipGrabberIn(){
+    public void flipGrabberIn() {
         if (grabberOpen) {
-            grab();
+            closeGrabber();
         }
         if (!grabberOpen) {
-            grabberFlip.setDirection(Servo.Direction.REVERSE); //test comment
-            grabberFlip.setPosition(1.0);
+           // grabberFlip.setDirection(Servo.Direction.REVERSE); //test comment
+            grabberFlip.setPosition(GRABBER_IN_POS);
             grabberIn = true;
             grabberOut = false;
             grabberMid = false;
@@ -64,8 +75,8 @@ public class Grabber {
     }
 
 
-    public void flipGrabberMiddle(){
-        grabberFlip.setPosition(0.5);
+    public void flipGrabberMiddle() {
+        grabberFlip.setPosition(GRABBER_MID_POS);
         grabberMid = true;
         grabberOut = false;
         grabberIn = false;
@@ -77,26 +88,6 @@ public class Grabber {
 
     public boolean isGrabberOut() {
         return grabberOut;
-    }
-
-    public void flipIntakeUp() {
-        if (!grabberIn) {
-            flipGrabberIn();
-        }
-        if (!grabberOpen) {
-            release();
-        }
-        intakeFlip.setPosition(1.0);
-        intakeUp = true;
-    }
-
-    public void flipIntakeDown() {
-        intakeFlip.setPosition(0.0);
-        intakeUp = false;
-    }
-
-    public boolean isIntakeUp() {
-        return intakeUp;
     }
 
 }
