@@ -21,7 +21,6 @@ import org.firstinspires.ftc.teamcode.hardware.HardwareStore;
 @Autonomous(name = "Sample Auto", group = "Autonomous")
 public class SampleAuto extends DuckbotAuto {
 
-    private MecanumDrive drive = null;
     private Grabber teleGrabber = null;
     private AutoArm arm = null;
     private AutoIntake intake = null;
@@ -42,14 +41,20 @@ public class SampleAuto extends DuckbotAuto {
         Actions.runBlocking(
                 new SequentialAction(
                         grabber.grabberIn(),
+                        new SleepAction(0.2),
+                        grabber.grabberRelease(),
+                        arm.liftToTargetPosition(Arm.LIFT_GRAB_FROM_WALL),
                         new ParallelAction(
-                                arm.liftToTargetPosition(0),
-                                intake.intakeDown()
-                        ),
-                        new ParallelAction(
+                                intake.intakeOpen(),
                                 driveToSample.build() // will need to alter the grab pos to be more accurate
                         ),
+                        new SleepAction(0.2),
+                        intake.intakeDown(),
+                        new SleepAction(0.2),
                         intake.intakeClose(),
+                        new SleepAction(1.0),
+                        arm.liftToTargetPosition(0),
+                        new SleepAction(0.5),
                         intake.intakeUp(),
                         intake.retract(),
                         new SleepAction(1.0),
@@ -64,6 +69,7 @@ public class SampleAuto extends DuckbotAuto {
                         driveToScore.build(),
                         new SequentialAction(
                                 intake.intakeOpen(), //might need wait in between
+                                new SleepAction(0.2),
                                 intake.intakeDown(),
                                 arm.liftToTargetPosition(Arm.LIFT_BASKET),
                                 grabber.grabberOut(),
@@ -86,7 +92,7 @@ public class SampleAuto extends DuckbotAuto {
         grabber = new AutoGrabber(hardwareStore);
 
         teleGrabber = hardwareStore.getGrabber();
-        drive = hardwareStore.getDrive();
+        MecanumDrive drive = hardwareStore.getDrive();
 
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
@@ -96,8 +102,7 @@ public class SampleAuto extends DuckbotAuto {
         waitForStart();
 
         Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(0));
-        Vector2d scoringPose = new Vector2d(8, 17);
-        Vector2d closeScoringPose = new Vector2d(14, 26); //arbitrary value
+        Vector2d scoringPose = new Vector2d(9.5, 11);
         double scoringHeading = Math.toRadians(-45);
 
         if (opModeIsActive()) {
@@ -125,19 +130,19 @@ public class SampleAuto extends DuckbotAuto {
 
             /* Cycle 3 samples */
             TrajectoryActionBuilder cycle1 = cycleSample(scorePreload,
-                    31, 8.8, 0,
-                    8, 17, 0);
+                    25, 7, 0,
+                    11.5, 11.5, scoringHeading);
 
             TrajectoryActionBuilder cycle2 = cycleSample(cycle1,
-                    31, 17.5, 0,
-                    8, 17, 0);
+                    27, 17.5, 0,
+                    12.5, 11.5, scoringHeading);
 
-            TrajectoryActionBuilder cycle3 = cycleSample(cycle2,
-                    -26, -4, 0,
-                    8, 17, 0);
+//            TrajectoryActionBuilder cycle3 = cycleSample(cycle2,
+//                    -26, -4, 0,
+//                    8, 17, scoringHeading);
 
             /* Park */
-            TrajectoryActionBuilder driveToPark = cycle3.endTrajectory().fresh()
+            TrajectoryActionBuilder driveToPark = cycle2.endTrajectory().fresh()
                     .strafeToLinearHeading(new Vector2d(44, -7), Math.toRadians(90)) // back up from basket and turn
                     .strafeTo(new Vector2d(44, -23.5)); // strafe to chamber //linear slide touch bar pos: 1250
 
