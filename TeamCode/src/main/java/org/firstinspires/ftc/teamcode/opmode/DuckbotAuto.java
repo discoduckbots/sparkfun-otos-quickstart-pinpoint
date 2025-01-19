@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.hardware.Arm;
@@ -17,6 +19,22 @@ public abstract class DuckbotAuto extends LinearOpMode {
     private static final double INTAKE_SPEED = 1.0;
     private static final double LIFT_SPEED = 1.0;
     private static final double EXTENSION_SPEED = 0.3;
+
+    /**
+     * Given a starting position and a desired x, y, heading, returns a trajectory
+     * that strafes to the desired position
+     *
+     * @param start - Starting Position
+     * @param x     - Desired X Position
+     * @param y     - Desired Y Position
+     * @param heading - Desired Heading
+     * @return TrajectoryActionBuilder
+     */
+    protected TrajectoryActionBuilder buildSimpleTrajectory (TrajectoryActionBuilder start, double x, double y, double heading) {
+        return start.fresh()
+                .strafeToLinearHeading(new Vector2d(x, y), Math.toRadians(heading));
+    }
+
     public class AutoArm {
         private Arm arm;
 
