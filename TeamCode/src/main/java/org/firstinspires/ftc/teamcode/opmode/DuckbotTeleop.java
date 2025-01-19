@@ -94,6 +94,13 @@ public class DuckbotTeleop extends LinearOpMode {
                 telemetry.update();
             }
 
+            if (gamepad1.a) {
+                intake.rotateIntakeTo0();
+            }
+            if (gamepad1.b) {
+                intake.rotateIntakeTo90();
+            }
+
             if (gamepad2.dpad_up){
                 arm.lift(LIFT_SPEED);
             }
@@ -152,7 +159,7 @@ public class DuckbotTeleop extends LinearOpMode {
             }
 
             if (gamepad2.x) {
-                arm.liftByEncoder(Arm.LIFT_GRAB_FROM_WALL, LIFT_SPEED);
+                arm.liftByEncoder(Arm.LIFT_PLACE_SPECIMEN, LIFT_SPEED);
             }
 
             /*if(gamepad2.x) {

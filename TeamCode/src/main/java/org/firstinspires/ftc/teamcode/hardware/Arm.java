@@ -14,10 +14,10 @@ public class Arm {
     public static final int LIFT_MAX = 4670;
     public static final int LIFT_BASKET = 4200;
     public static final int LIFT_ABOVE_BAR = 1750;
-    public static final int LIFT_PLACE_SPECIMEN = 1800;
+    public static final int LIFT_PLACE_SPECIMEN = 1850;
     public static final int LIFT_BELOW_BAR = 1600;
-    public static final int LIFT_GRAB_FROM_WALL = 80;
-    public static final int LIFT_RAISE_ABOVE_WALL = 120;
+    public static final int LIFT_GRAB_FROM_WALL = 120;
+    public static final int LIFT_RAISE_ABOVE_WALL = 150;
     public static final int LIFT_TOUCH_LOW_BAR = 1250;
     public static final int LIFT_ABOVE_LOW_BAR = 1400;
     public static final int LIFT_MIN = 0;

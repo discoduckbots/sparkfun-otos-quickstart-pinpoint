@@ -7,9 +7,9 @@ public class Grabber {
     Servo grabberFlip = null;
 
     private static final double GRABBER_OPEN_POS = 0;
-    private static final double GRABBER_CLOSE_POS = 0.59;
+    private static final double GRABBER_CLOSE_POS = 0.62;
     private static final double GRABBER_IN_POS = 0.01;
-    private static final double GRABBER_OUT_POS = 1;
+    private static final double GRABBER_OUT_POS = 0.95;
     private static final double GRABBER_MID_POS = 0.6; //needs to be tested / adjusted
     private boolean grabberIn;
     private boolean grabberOut;
@@ -51,7 +51,7 @@ public class Grabber {
             closeGrabber();
         }
         if (!grabberOpen) {
-            //grabberFlip.setDirection(Servo.Direction.REVERSE);
+            grabberFlip.setDirection(Servo.Direction.FORWARD);
             //only if linear slide is all the way down
             grabberFlip.setPosition(GRABBER_OUT_POS);
             grabberOut = true;
@@ -65,7 +65,7 @@ public class Grabber {
             closeGrabber();
         }
         if (!grabberOpen) {
-           // grabberFlip.setDirection(Servo.Direction.REVERSE); //test comment
+            grabberFlip.setDirection(Servo.Direction.FORWARD); //test comment
             grabberFlip.setPosition(GRABBER_IN_POS);
             grabberIn = true;
             grabberOut = false;

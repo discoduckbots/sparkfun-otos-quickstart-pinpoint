@@ -13,6 +13,7 @@ public class Intake {
     private static final double INTAKE_CLOSE_POS = 1;
     private static final double INTAKE_UP_POS = 0.25;
     private static final double INTAKE_DOWN_POS = 0.77;
+    private static final double INTAKE_DOWN_LOWER = 0.8;
     private static final double INTAKE_ROTATE_90_POS = 0;
     private static final double INTAKE_ROTATE_0_POS = 0.5;
 
