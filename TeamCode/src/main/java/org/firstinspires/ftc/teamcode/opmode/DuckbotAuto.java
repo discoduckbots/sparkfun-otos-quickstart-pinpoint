@@ -170,7 +170,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
                 if (!initialized) {
                     initialized = true;
                     resetRuntime();
-                    intake.extendLittleByEncoder(EXTENSION_SPEED);
+                    intake.extendByEncoder(EXTENSION_SPEED);
                 }
 
                 return false;

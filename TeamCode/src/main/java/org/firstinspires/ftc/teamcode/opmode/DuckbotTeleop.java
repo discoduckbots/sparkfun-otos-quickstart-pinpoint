@@ -94,9 +94,9 @@ public class DuckbotTeleop extends LinearOpMode {
                 telemetry.update();
             }
 
-            if (gamepad1.a) {
+            /*if (gamepad1.a) {
                 intake.rotateIntakeTo0();
-            }
+            } */
             if (gamepad1.b) {
                 intake.rotateIntakeTo90();
             }
@@ -105,36 +105,33 @@ public class DuckbotTeleop extends LinearOpMode {
                 arm.lift(LIFT_SPEED);
             }
             else if (gamepad2.dpad_down){
-                arm.lower(LOWER_SPEED);
+                arm.lower(LIFT_SPEED);
             }
             else{
                 arm.liftByEncoder(arm.getLiftPos(), LOWER_SPEED);
             }
 
             //boolean test code - need to remove or implement
-            /*if (gamepad1.a && !grabberPressed) {
-                grabber.booleanGrabber();
-                grabberPressed = true;
+            if (gamepad2.a) {
+                grabber.onPressGrabber();
             }
             else {
-                grabberPressed = false;
+                grabber.onReleaseGrabber();
             }
 
-            if (gamepad1.b && !intakeGrabberPressed) {
-                intake.booleanIntakeGrabber();
-                intakeGrabberPressed = true;
+            if (gamepad2.x) {
+                intake.onPressIntake();
             }
             else {
-                intakeGrabberPressed = false;
+                intake.onReleaseIntake();
             }
 
-            if (gamepad1.back && !intakeFlipPressed) {
-                intake.booleanFlipIntake();
-                intakeFlipPressed = true;
+            if (gamepad2.y) {
+                intake.onPressFlip();
             }
             else {
-                intakeFlipPressed = false;
-            }*/
+                intake.onReleaseFlip();
+            }
             //end of test code - if works need to change buttons + add intakeFlip
 
             if (gamepad2.left_bumper){
@@ -161,6 +158,7 @@ public class DuckbotTeleop extends LinearOpMode {
             if (gamepad2.x) {
                 arm.liftByEncoder(Arm.LIFT_PLACE_SPECIMEN, LIFT_SPEED);
             }
+
 
             /*if(gamepad2.x) {
                 grabber.flipIntakeDown();
