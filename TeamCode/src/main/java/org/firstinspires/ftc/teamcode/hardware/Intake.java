@@ -6,20 +6,22 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Intake {
 
-    private static final int EXTEND_OUT = 430;
+    private static final int EXTEND_OUT = 500;
     private static final int EXTEND_LITTLE = 100;
     private static final int EXTEND_IN = 0;
-    private static final double INTAKE_OPEN_POS= 0;
-    private static final double INTAKE_CLOSE_POS = 1;
+    private static final double INTAKE_OPEN_POS= 0.8;
+    private static final double INTAKE_CLOSE_POS = 0.4;
     private static final double INTAKE_UP_POS = 0.25;
     private static final double INTAKE_DOWN_POS = 0.77;
     private static final double INTAKE_DOWN_LOWER = 0.8;
-    private static final double INTAKE_ROTATE_90_POS = 0;
-    private static final double INTAKE_ROTATE_0_POS = 0.5;
+    private static final double INTAKE_ROTATE_90_POS = 1.0; //b
+    private static final double INTAKE_ROTATE_0_POS = 0.0; //a
 
     private boolean isRotatedTo0 = true;
     private boolean isIntakeOpen;
     private boolean isIntakeUp = true;
+    private boolean buttonPressIntake = false;
+    private boolean buttonPressFlip = false;
     public Servo intakeGrab;
     public Servo intakeRotate;
     public Servo intakeFlip;
@@ -45,13 +47,22 @@ public class Intake {
         isIntakeOpen = false;
     }
 
-    public void booleanIntakeGrabber() {
-        if(isIntakeOpen) {
+    public void onPressIntake() {
+
+        if (buttonPressIntake) return;
+        buttonPressIntake = true;
+        if (isIntakeOpen) {
+            isIntakeOpen = false;
             closeIntake();
         }
         else {
+            isIntakeOpen = true;
             openIntake();
         }
+    }
+
+    public void onReleaseIntake() {
+        buttonPressIntake = false;
     }
 
     public void flipIntakeUp() {
@@ -69,13 +80,22 @@ public class Intake {
         isIntakeUp = false;
     }
 
-    public void booleanFlipIntake() {
+    public void onPressFlip() {
+
+        if (buttonPressFlip) return;
+        buttonPressFlip = true;
         if (isIntakeUp) {
+            isIntakeUp = false;
             flipIntakeDown();
         }
         else {
+            isIntakeUp = true;
             flipIntakeUp();
         }
+    }
+
+    public void onReleaseFlip() {
+        buttonPressFlip = false;
     }
 
     public void rotateIntakeTo90() {
@@ -109,18 +129,21 @@ public class Intake {
 
     public void extendByEncoder(double power){
         extensionMotor.setTargetPosition(EXTEND_OUT);
+        extensionMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         extensionMotor.setPower(power);
     }
 
     public void extendLittleByEncoder(double power){
         extensionMotor.setTargetPosition(EXTEND_LITTLE);
+        extensionMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         extensionMotor.setPower(power);
     }
 
     public void retractByEncoder(double power){
         extensionMotor.setTargetPosition(EXTEND_IN);
+        extensionMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         extensionMotor.setPower(power);
     }

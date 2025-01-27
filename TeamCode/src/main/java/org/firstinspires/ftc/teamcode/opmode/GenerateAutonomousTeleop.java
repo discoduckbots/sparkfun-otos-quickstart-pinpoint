@@ -231,7 +231,7 @@ public class GenerateAutonomousTeleop extends LinearOpMode {
 
             String TRAJ_CODE =
                     "Pose2d firstPose = new Pose2d(0,0,0);\n"+
-                            "Vector2d secondVector = new Vector2d(" + arrayList.get(1).x + ", " + arrayList.get(1).y + ");\n" +
+                            "Vector2d secondVector = new Vector2d(" + arrayList.get(1).x + ", " + arrayList.get(1).y +");/n"+
 
                     "TrajectoryActionBuilder traj1 = drive.actionBuilder(firstPose)\n"+
                     "       .strafeToLinearHeading(secondVector," + arrayList.get(1).heading + ").build();\n";

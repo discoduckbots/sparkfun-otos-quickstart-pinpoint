@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="Dustin Test Op Mode", group= "Linear Opmode")
-@Disabled
 public class DustinTestOpMode extends LinearOpMode {
 
     Servo testServo = null;
@@ -35,27 +34,47 @@ public class DustinTestOpMode extends LinearOpMode {
 
             
 
-            double pos = 0.5 + (-gamepad1.left_stick_y * 0.5);
+//            double pos = 0.5 + (-gamepad1.left_stick_y * 0.5);
+//
+//            testServo.setPosition(pos);
 
-            testServo.setPosition(pos);
-
-            telemetry.addData("servo-pos", pos);
+            telemetry.addData("servo-pos", testServo.getPosition());
             telemetry.addData("LS-x - LS-y", gamepad1.left_stick_x + ", " + (gamepad1.left_stick_y*-1));
             telemetry.update();
 
 
 
 
-            if (gamepad1.x){
-               testServo.setPosition(0);
+            if (gamepad1.square){
+               testServo.setPosition(0.15);
            }
-            if (gamepad1.a){
-               testServo.setPosition(0.5);
+            if (gamepad1.cross){
+               testServo.setPosition(0.2);
            }
 
-            if (gamepad1.b){
-               testServo.setPosition(1);
+            if (gamepad1.circle){
+               testServo.setPosition(0.25);
            }
+
+            if (gamepad1.triangle){
+                testServo.setPosition(0.3);
+            }
+
+            if (gamepad1.left_bumper){
+                testServo.setPosition(0.35);
+            }
+
+            if (gamepad1.left_trigger > 0.1){ //closed
+                testServo.setPosition(0.4);
+            }
+
+            if (gamepad1.right_bumper){
+                testServo.setPosition(0.45);
+            }
+
+            if (gamepad1.right_trigger > 0.5){ //open
+                testServo.setPosition(1);
+            }
         }
 
     }
