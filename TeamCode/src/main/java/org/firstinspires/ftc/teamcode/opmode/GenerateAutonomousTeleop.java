@@ -68,7 +68,7 @@ import java.util.List;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="Gen Autonomous Teleop", group="Linear Opmode")
-public class NewAutonomousGenerator extends LinearOpMode {
+public class GenerateAutonomousTeleop extends LinearOpMode {
 
     private PinpointDrive sampleMecanumDrive = null;
 
@@ -231,7 +231,7 @@ public class NewAutonomousGenerator extends LinearOpMode {
 
             String TRAJ_CODE =
                     "Pose2d firstPose = new Pose2d(0,0,0);\n"+
-                            "Vector2d secondVector = new Vector2d(" + arrayList.get(1).x + ", " + arrayList.get(1).y)+");/n"+
+                            "Vector2d secondVector = new Vector2d(" + arrayList.get(1).x + ", " + arrayList.get(1).y + ");\n" +
 
                     "TrajectoryActionBuilder traj1 = drive.actionBuilder(firstPose)\n"+
                     "       .strafeToLinearHeading(secondVector," + arrayList.get(1).heading + ").build();\n";
