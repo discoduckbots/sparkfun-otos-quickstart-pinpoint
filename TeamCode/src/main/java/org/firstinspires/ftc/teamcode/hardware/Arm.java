@@ -11,16 +11,14 @@ public class Arm {
     public TouchSensor leftLimitSwitch;
     public TouchSensor rightLimitSwitch;
 
-    public static final int LIFT_MAX = 4670;
-    public static final int LIFT_BASKET = 4200;
+    public static final int LIFT_BASKET = 4250;
     public static final int LIFT_ABOVE_BAR = 1750;
-    public static final int LIFT_PLACE_SPECIMEN = 1950;
+    public static final int LIFT_PLACE_SPECIMEN = 1860;
     public static final int LIFT_BELOW_BAR = 1600;
     public static final int LIFT_GRAB_FROM_WALL = 120;
     public static final int LIFT_RAISE_ABOVE_WALL = 150;
     public static final int LIFT_TOUCH_LOW_BAR = 1250;
     public static final int LIFT_ABOVE_LOW_BAR = 1400;
-    public static final int LIFT_MIN = 0;
 
     // high goal - L: -4418, R: -6302
 // above bar - L: 2134, R:4154
@@ -89,7 +87,6 @@ public class Arm {
         liftLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         liftRight.setTargetPosition(position);
         liftRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
         liftLeft.setPower(power);
         liftRight.setPower(power);
     }

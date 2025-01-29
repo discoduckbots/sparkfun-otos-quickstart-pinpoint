@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Intake {
 
-    private static final int EXTEND_OUT = 500;
+    private static final int EXTEND_OUT = 600;
     private static final int EXTEND_LITTLE = 100;
     private static final int EXTEND_IN = 0;
     private static final double INTAKE_OPEN_POS= 0.8;
@@ -108,6 +108,10 @@ public class Intake {
         isRotatedTo0 = true;
     }
 
+    public void rotateIntake(double position) {
+        intakeRotate.setPosition(position);
+    }
+
     public int getExtensionPos() {
         return extensionMotor.getCurrentPosition();
     }
@@ -129,21 +133,21 @@ public class Intake {
 
     public void extendByEncoder(double power){
         extensionMotor.setTargetPosition(EXTEND_OUT);
-        extensionMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        extensionMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         extensionMotor.setPower(power);
     }
 
-    public void extendLittleByEncoder(double power){
-        extensionMotor.setTargetPosition(EXTEND_LITTLE);
+    public void extendEncoderAuto(int position, double power){
         extensionMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        extensionMotor.setTargetPosition(position);
         extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         extensionMotor.setPower(power);
     }
 
     public void retractByEncoder(double power){
         extensionMotor.setTargetPosition(EXTEND_IN);
-        extensionMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        extensionMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         extensionMotor.setPower(power);
     }

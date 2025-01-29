@@ -2,19 +2,17 @@ package org.firstinspires.ftc.teamcode.opmode;
 
 import android.util.Log;
 
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.PinpointDrive;
-import org.firstinspires.ftc.teamcode.TankDrive;
 import org.firstinspires.ftc.teamcode.hardware.Arm;
 import org.firstinspires.ftc.teamcode.hardware.Grabber;
 import org.firstinspires.ftc.teamcode.hardware.HardwareStore;
@@ -22,9 +20,8 @@ import org.firstinspires.ftc.teamcode.hardware.Intake;
 import org.firstinspires.ftc.teamcode.hardware.ScoringMechanism;
 
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="Fancy Teleop", group= "Linear Opmode")
-@Disabled
-public class FancyTeleop extends LinearOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="Fancy Cancelable Teleop", group= "Linear Opmode")
+public class FancyCancelableTeleop extends LinearOpMode {
     enum Mode {
         DRIVER_CONTROL,
         AUTOMATIC_CONTROL
@@ -43,12 +40,13 @@ public class FancyTeleop extends LinearOpMode {
     private double LIFT_SPEED = 1.0;
     private double LOWER_SPEED = 0.7;
     private double EXTENSION_SPEED = 0.7;
-    private boolean intakeGrabberPressed = false;
-    private boolean intakeFlipPressed = false;
-    private boolean grabberPressed = false;
+    private boolean inGrabPosition = false;
 
-    private Pose2d lastPosition = null;
+    private Pose2d lastPositionA = null;
+    private Pose2d lastPositionB = null;
     boolean lastPositionPressed = false;
+    Action moveToLastPosAction = null;
+
 
 
     @Override
@@ -110,6 +108,12 @@ public class FancyTeleop extends LinearOpMode {
             if (gamepad1.b) {
                 intake.rotateIntakeTo90();
             }
+            if (gamepad2.right_stick_y > 0.05) {
+                intake.extend(gamepad2.right_stick_y);
+            }
+            else if (gamepad2.right_stick_y < 0.05) {
+                intake.extend(gamepad2.right_stick_y);
+            }
 
             if (gamepad2.dpad_up){
                 arm.lift(LIFT_SPEED);
@@ -118,91 +122,53 @@ public class FancyTeleop extends LinearOpMode {
                 arm.lower(LIFT_SPEED);
             }
             else{
-                arm.liftByEncoder(arm.getLiftPos(), LOWER_SPEED);
+                arm.stop();
             }
 
-            //boolean test code - need to remove or implement
-            if (gamepad2.a) {
-                grabber.onPressGrabber();
+            if (gamepad2.left_trigger > 0.2) {
+                intake.onPressFlip();
             }
             else {
-                grabber.onReleaseGrabber();
+                intake.onReleaseFlip();
             }
 
-            if (gamepad2.x) {
+            if (gamepad2.left_bumper) {
                 intake.onPressIntake();
             }
             else {
                 intake.onReleaseIntake();
             }
 
-            if (gamepad2.y) {
-                intake.onPressFlip();
+            if (gamepad2.right_bumper) {
+                grabber.onPressGrabber();
             }
             else {
-                intake.onReleaseFlip();
-            }
-            //end of test code - if works need to change buttons + add intakeFlip
-
-            if (gamepad2.left_bumper){
-                grabber.closeGrabber();
-            }
-            else if (gamepad2.right_bumper){
-                grabber.openGrabber();
-            }
-
-            if (gamepad2.left_trigger > 0.25) {
-                intake.closeIntake();
-            }
-            else if (gamepad2.right_trigger > 0.25) {
-                intake.openIntake();
-            }
-
-            /*if (gamepad2.a) {
-                grabber.flipGrabberOut();
-            } */ // needs to be brought back
-            else if (gamepad2.b) {
-                grabber.flipGrabberIn();
-            }
-
-            if (gamepad2.x) {
-                arm.liftByEncoder(Arm.LIFT_PLACE_SPECIMEN, LIFT_SPEED);
+                grabber.onReleaseGrabber();
             }
 
 
-            /*if(gamepad2.x) {
-                grabber.flipIntakeDown();
+            if (gamepad2.a) {
+                grabber.onPressFlip();
             }
-            else if (gamepad2.y) {
-                grabber.flipIntakeUp();
-            } */
+            else {
+                grabber.onReleaseFlip();
+            }
 
-            /*if (gamepad2.y) {
-                grabber.flipGrabberMiddle();
-                //intake.flipIntakeDown(); need to put back
-            } /*
-
-            /*if (gamepad2.x) {
-                grabber.flipIntakeUp();
-            } */
-/*
             if (gamepad2.x && !inGrabPosition) {
                 inGrabPosition = true;
-                //intake.extendByEncoder(EXTENSION_SPEED);
                 grabber.flipGrabberIn();
                 grabber.openGrabber();
                 intake.flipIntakeUp();
-                arm.liftByEncoder(Arm.LIFT_MIN, LIFT_SPEED);
-                sleep(250);
+                arm.liftByEncoder(0, LIFT_SPEED);
                 intake.retractByEncoder(EXTENSION_SPEED);
-                sleep(500);
+                sleep(200);
                 grabber.closeGrabber();
-                sleep(250);
+                sleep(200);
                 intake.openIntake();
                 intake.flipIntakeDown();
-//                scoringMechanism.grabFromIntake(EXTENSION_SPEED, ARM_SPEED, this);
                 inGrabPosition = false;
-            } */
+            }
+
 
 
 
@@ -239,42 +205,47 @@ public class FancyTeleop extends LinearOpMode {
 
                 drive.updatePoseEstimate();
                 if (gamepad1.dpad_up) {
-                    lastPosition = poseEstimate;
-                    Log.d("LAST", "Setting last position to " + lastPosition);
+                    lastPositionA = poseEstimate;
+                    Log.d("LAST", "Setting last position to " + lastPositionA);
                 }
-                if (gamepad1.dpad_down) {
+                if (gamepad1.dpad_left) {
+                    lastPositionB = poseEstimate;
+                    Log.d("LAST", "Setting last position to " + lastPositionB);
+                }
+                if (gamepad1.dpad_down || gamepad1.dpad_right) {
                     if (!lastPositionPressed) {
                         lastPositionPressed = true;
+                        Pose2d lastPosition = null;
+                        if (gamepad1.dpad_down) lastPosition = lastPositionA;
+                        else lastPosition = lastPositionB;
                         if (lastPosition != null) {
                             currentMode = Mode.AUTOMATIC_CONTROL;
                             TrajectoryActionBuilder moveToLastPosition = drive.actionBuilder(drive.getPose())
                                     .strafeToLinearHeading(new Vector2d(lastPosition.position.x, lastPosition.position.y), lastPosition.heading);
-                            Actions.runBlocking(
-                                    moveToLastPosition.build()
-                            );
-                            currentMode = Mode.DRIVER_CONTROL;
+                            moveToLastPosAction = moveToLastPosition.build();
+
                         }
                     }
-                } else {
+                }
+                else {
                     lastPositionPressed = false;
                 }
 
                 break;
             case AUTOMATIC_CONTROL:
-                /*
-                // If x is pressed, we break out of the automatic following
-                if (gamepad1.x) {
-                    drive.breakFollowing();
+                if (gamepad1.a) {
+                    //drive.
                     currentMode = Mode.DRIVER_CONTROL;
+                    return;
                 }
+               if (moveToLastPosAction != null) {
+                   TelemetryPacket packet = new TelemetryPacket();
+                   moveToLastPosAction.preview(packet.fieldOverlay());
+                   if (!moveToLastPosAction.run(packet)) {
+                       currentMode = Mode.DRIVER_CONTROL;
+                   }
 
-                // If drive finishes its task, cede control to the driver
-                if (!drive.) {
-                    currentMode = Mode.DRIVER_CONTROL;
-                }
-                break;
-
-                 */
+               }
         }
     }
 

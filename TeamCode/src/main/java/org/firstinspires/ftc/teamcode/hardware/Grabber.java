@@ -8,7 +8,7 @@ public class Grabber {
 
     private static final double GRABBER_OPEN_POS = 0;
     private static final double GRABBER_CLOSE_POS = 0.65;
-    private static final double GRABBER_IN_POS = 0.01;
+    private static final double GRABBER_IN_POS = 0.03;
     private static final double GRABBER_OUT_POS = 0.95;
     private static final double GRABBER_MID_POS = 0.6; //needs to be tested / adjusted
     private boolean grabberIn;
@@ -16,6 +16,7 @@ public class Grabber {
     private boolean grabberMid;
     private boolean grabberOpen = false;
     private boolean buttonPressGrabber = false;
+    private boolean buttonPressFlip = false;
 
 
     public Grabber(Servo grabberServo, Servo grabberFlip) {
@@ -90,6 +91,24 @@ public class Grabber {
         grabberMid = true;
         grabberOut = false;
         grabberIn = false;
+    }
+
+    public void onPressFlip() {
+
+        if (buttonPressFlip) return;
+        buttonPressFlip = true;
+        if (grabberIn) {
+            grabberIn = false;
+            flipGrabberOut();
+        }
+        else {
+            grabberIn = true;
+            flipGrabberIn();
+        }
+    }
+
+    public void onReleaseFlip() {
+        buttonPressFlip = false;
     }
 
     public boolean isGrabberIn() {

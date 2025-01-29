@@ -18,7 +18,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
     private static final double INTAKE_TIME = 1.5;
     private static final double INTAKE_SPEED = 1.0;
     private static final double LIFT_SPEED = 1.0;
-    private static final double EXTENSION_SPEED = 0.3;
+    private static final double EXTENSION_SPEED = 1.0;
 
     /**
      * Given a starting position and a desired x, y, heading, returns a trajectory
@@ -120,6 +120,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
                 intake.stop(); */
                 return  false;
             }
+
         }
 
         public class IntakeOpen implements Action {
@@ -162,6 +163,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
         }
 
         public class Extend implements Action {
+
 
             private boolean initialized = false;
 

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.hardware.ScoringMechanism;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="Duckbot Op Mode", group= "Linear Opmode")
+@Disabled
 public class DuckbotTeleop extends LinearOpMode {
 
     Arm arm = null;
@@ -27,7 +29,7 @@ public class DuckbotTeleop extends LinearOpMode {
     private double TURN_THROTTLE = 0.5;
     private double LIFT_SPEED = 1.0;
     private double LOWER_SPEED = 0.7;
-    private double EXTENSION_SPEED = 0.7;
+    private double EXTENSION_SPEED = 1.0;
     private boolean intakeGrabberPressed = false;
     private boolean intakeFlipPressed = false;
     private boolean grabberPressed = false;

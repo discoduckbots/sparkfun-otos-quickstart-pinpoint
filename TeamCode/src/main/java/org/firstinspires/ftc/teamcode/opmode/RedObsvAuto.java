@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.hardware.Arm;
 import org.firstinspires.ftc.teamcode.hardware.Grabber;
 import org.firstinspires.ftc.teamcode.hardware.HardwareStore;
+import org.firstinspires.ftc.teamcode.hardware.Intake;
 
 @Config
 @Autonomous(name = "RedSpecimenAuto", group = "Autonomous")
@@ -24,6 +25,8 @@ public class RedObsvAuto extends DuckbotAuto {
 
     MecanumDrive drive = null;
     Grabber teleGrabber = null;
+
+    Intake teleIntake = null;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -35,20 +38,19 @@ public class RedObsvAuto extends DuckbotAuto {
 
         drive = hardwareStore.getDrive();
         teleGrabber = hardwareStore.getGrabber();
+        teleIntake = hardwareStore.getIntake();
 
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
         teleGrabber.closeGrabber();
+        teleIntake.rotateIntakeTo0();
 
         waitForStart();
         TranslationalVelConstraint slowVel = new TranslationalVelConstraint(40);
         ProfileAccelConstraint slowAccel = new ProfileAccelConstraint(-40, 40);
         Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(0));
-        Vector2d grabPose = new Vector2d(-15, 23);
-        Vector2d closeGrabPose = new Vector2d(-15, 23);
-        Vector2d awayFromWallPose = new Vector2d(-15, 21.5);
-        Vector2d awayFromBarPose = new Vector2d(-12, 15);
-
+        Vector2d grabPose = new Vector2d(-20, 23);
+        Vector2d closeGrabPose = new Vector2d(-14.5, 23);
 
         TrajectoryActionBuilder deliverPreload = drive.actionBuilder(initialPose)
                 .strafeTo(new Vector2d(-20, -12.7)); // move to bar
@@ -57,17 +59,29 @@ public class RedObsvAuto extends DuckbotAuto {
                 .strafeTo(new Vector2d(-31.4, -12.7));
 
         TrajectoryActionBuilder backUpFromBar = ramBarForPreload.endTrajectory().fresh()
-                .strafeTo(new Vector2d(-20, -12.7));
+                .strafeTo(new Vector2d(-22, -12.7))
+                .strafeToLinearHeading(new Vector2d(-27, 13.4), Math.toRadians(-180));
 
+        TrajectoryActionBuilder grabFirst = backUpFromBar.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-30, 25.7))
+                .strafeTo(new Vector2d(-38, 25.7));
 
-        TrajectoryActionBuilder pushSamplesToObsZone = backUpFromBar.endTrajectory().fresh()
-                .strafeToLinearHeading(new Vector2d(-23, 10), Math.toRadians(180)) // move over and turn 180
-                .strafeTo(new Vector2d(-56.5, 28.8)); //to first push position
-                //.strafeTo(new Vector2d(-12.5, 28.8)); //push first sample back
-                //.strafeTo(new Vector2d(-56.5, 36)) //position for second sample
-                //.strafeTo(new Vector2d(-12.5, 36)) //push second sample back
-                //.strafeTo(new Vector2d(-56, 42.5))//position for third sample
-                //.strafeTo(new Vector2d(-12.5, 42.5)) //push third sample back
+        TrajectoryActionBuilder deliverFirst = grabFirst.endTrajectory().fresh()
+                .strafeToLinearHeading(new Vector2d(-10, 38), Math.toRadians(0));
+
+        TrajectoryActionBuilder grabSecond = deliverFirst.endTrajectory().fresh()
+                .strafeToLinearHeading(new Vector2d(-27, 38), Math.toRadians(-180))
+                .strafeTo(new Vector2d(-38, 35));
+
+        TrajectoryActionBuilder deliverSecond = grabSecond.endTrajectory().fresh()
+                .strafeToLinearHeading(new Vector2d(-10, 42), Math.toRadians(0));
+
+        TrajectoryActionBuilder firstMoveToWall = deliverSecond.endTrajectory().fresh()
+                //.strafeTo(new Vector2d(-20, 30))
+                .strafeToLinearHeading((grabPose), Math.toRadians(-180));
+
+        TrajectoryActionBuilder firstGrabFromWall = firstMoveToWall.endTrajectory().fresh()
+                .strafeTo(closeGrabPose);
 
         //TrajectoryActionBuilder firstMoveToWall = pushSamplesToObsZone.endTrajectory().fresh()
         //        .strafeTo(grabPose);
@@ -117,7 +131,8 @@ public class RedObsvAuto extends DuckbotAuto {
 */
         if (opModeIsActive()) {
             if (isStopRequested()) return;
-// Score Preload Speciment
+
+// Score Preload Specimen
             Actions.runBlocking(
                     new SequentialAction(
                             grabber.grabberGrab(),
@@ -132,17 +147,66 @@ public class RedObsvAuto extends DuckbotAuto {
                             grabber.grabberRelease()
                     )
             );
-// Push Samples
+// Push First Sample
             Actions.runBlocking(
                     new SequentialAction(
                             backUpFromBar.build(),
                             grabber.grabberIn(),
                             new ParallelAction(
+                                    intake.retract(),
                                     arm.liftToTargetPosition(Arm.LIFT_GRAB_FROM_WALL),
-                                    pushSamplesToObsZone.build()
-                            )
+                                    grabFirst.build(),
+                                    intake.intakeDown(),
+                                    intake.intakeOpen()
+                            ),
+                            new SleepAction(0.2),
+                            intake.intakeClose(),
+                            new SleepAction(0.2),
+                            deliverFirst.build(),
+                            intake.intakeOpen(),
+                            new SleepAction(0.1)
                     )
             );
+// Push Second Sample
+            Actions.runBlocking(
+                    new SequentialAction(
+                            new ParallelAction(
+                                    intake.retract(),
+                                    arm.liftToTargetPosition(Arm.LIFT_GRAB_FROM_WALL),
+                                    grabSecond.build(),
+                                    intake.intakeDown(),
+                                    intake.intakeOpen()
+                            ),
+                            new SleepAction(0.2),
+                            intake.intakeClose(),
+                            new SleepAction(0.2),
+                            deliverSecond.build(),
+                            intake.intakeOpen()
+                    )
+            );
+//Grab first specimen from wall
+            Actions.runBlocking(
+                    new SequentialAction(
+                            new ParallelAction(
+                                    firstMoveToWall.build(),
+                                    intake.intakeUp(),
+                                    new SequentialAction(
+                                            grabber.grabberOut(),
+                                            new SleepAction(0.1),
+                                            grabber.grabberRelease()
+                                            )
+                            ),
+                            firstGrabFromWall.build(),
+                            new SleepAction(0.2),
+                            grabber.grabberGrab(),
+                            new SleepAction(0.2)
+                    )
+            );
+
+
+
+
+
   /*
  //grab first specimen from wall
             Actions.runBlocking(

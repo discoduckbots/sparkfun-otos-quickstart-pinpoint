@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
+@Disabled
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="Dustin Test Op Mode", group= "Linear Opmode")
 public class DustinTestOpMode extends LinearOpMode {
 
