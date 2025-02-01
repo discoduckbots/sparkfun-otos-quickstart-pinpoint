@@ -60,9 +60,9 @@ public abstract class DuckbotAuto extends LinearOpMode {
                     initialized = true;
                 }
 
-                if (arm.getLiftPos() != targetPosition){
-                    return true;
-                }
+//                if (arm.getLiftPos() != targetPosition){
+//                    return true;
+//                }
 
                 return false;
             }
@@ -238,7 +238,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
                 if (!initialized) {
                     initialized = true;
                     resetRuntime();
-                    grabber.closeGrabber();
+                    grabber.autoCloseGrabber();
                 }
 
                 return false;
@@ -268,7 +268,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 if (!initialized) {
                     initialized = true;
-                    grabber.flipGrabberIn();
+                    grabber.flipGrabberInAuto();
                 }
                 return  false;
             }

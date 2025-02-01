@@ -11,6 +11,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PinpointDrive;
 import org.firstinspires.ftc.teamcode.hardware.Arm;
@@ -41,7 +42,11 @@ public class FancyCancelableTeleop extends LinearOpMode {
     private double LOWER_SPEED = 0.7;
     private double EXTENSION_SPEED = 0.7;
     private boolean inGrabPosition = false;
-
+    boolean minute = false;
+    boolean endgame = false;
+    boolean tenSec = false;
+    boolean rumbling = false;
+    private ElapsedTime runtime = new ElapsedTime();
     private Pose2d lastPositionA = null;
     private Pose2d lastPositionB = null;
     boolean lastPositionPressed = false;
@@ -72,42 +77,17 @@ public class FancyCancelableTeleop extends LinearOpMode {
         while (opModeIsActive()) {
             driveControl(drive);
 
-            if (gamepad1.right_trigger > 0.1){
-                intake.openIntake();
-            }
-
-            if (gamepad1.left_trigger > 0.1){
-                intake.closeIntake();
-            }
-
-            if (gamepad1.right_bumper){
-                intake.extend(EXTENSION_SPEED);
-            }
-            else if (gamepad1.left_bumper){
-                intake.retractByEncoder(EXTENSION_SPEED);
+            if (gamepad1.b) {
+                intake.onPressRotate();
             }
             else {
-                intake.extendStop();
+                intake.onReleaseRotate();
             }
 
-
-            if (gamepad1.x) {
-                intake.flipIntakeDown();
-                telemetry.addData("trying to flip down", intake.intakeFlip.getPosition());
-                telemetry.update();
-            }
             if (gamepad1.y) {
-                intake.flipIntakeUp();
-                telemetry.addData("trying to flip up", intake.intakeFlip.getPosition());
-                telemetry.update();
+                intake.extensionHold.setPosition(1.0);
             }
 
-            /*if (gamepad1.a) {
-                intake.rotateIntakeTo0();
-            } */
-            if (gamepad1.b) {
-                intake.rotateIntakeTo90();
-            }
             if (gamepad2.right_stick_y > 0.05) {
                 intake.extend(gamepad2.right_stick_y);
             }
@@ -121,11 +101,15 @@ public class FancyCancelableTeleop extends LinearOpMode {
             else if (gamepad2.dpad_down){
                 arm.lower(LIFT_SPEED);
             }
+            else if (gamepad1.x) {
+                arm.liftByEncoder(Arm.LIFT_PLACE_SPECIMEN, LIFT_SPEED);
+            }
             else{
                 arm.stop();
             }
 
             if (gamepad2.left_trigger > 0.2) {
+                intake.openIntake();
                 intake.onPressFlip();
             }
             else {
@@ -146,6 +130,11 @@ public class FancyCancelableTeleop extends LinearOpMode {
                 grabber.onReleaseGrabber();
             }
 
+            if (gamepad2.right_trigger > .2) {
+                intake.openIntake();
+                intake.flipIntakeDown();
+            }
+
 
             if (gamepad2.a) {
                 grabber.onPressFlip();
@@ -158,15 +147,36 @@ public class FancyCancelableTeleop extends LinearOpMode {
                 inGrabPosition = true;
                 grabber.flipGrabberIn();
                 grabber.openGrabber();
-                intake.flipIntakeUp();
+                //intake.flipIntakeUp();
                 arm.liftByEncoder(0, LIFT_SPEED);
-                intake.retractByEncoder(EXTENSION_SPEED);
-                sleep(200);
+                //intake.retractByEncoder(EXTENSION_SPEED);
+                //sleep(300);
                 grabber.closeGrabber();
                 sleep(200);
                 intake.openIntake();
-                intake.flipIntakeDown();
+                //intake.flipIntakeDown();
                 inGrabPosition = false;
+            }
+
+            if (gamepad2.y){
+                intake.flipIntakeDown();
+                sleep(250);
+                intake.closeIntake();
+                sleep(250);
+                intake.flipIntakeUp();
+            }
+
+            if (runtime.time() >= 60 && !minute) {
+                gamepad2.rumbleBlips(2);
+                minute = true;
+            }
+            if (runtime.time() >= 90 && !endgame) {
+                gamepad2.rumbleBlips(3);
+                endgame = true;
+            }
+            if (runtime.time() >= 110 && !tenSec) {
+                gamepad2.rumbleBlips(5);
+                tenSec = true;
             }
 
 

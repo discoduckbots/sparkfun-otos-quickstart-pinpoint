@@ -24,6 +24,8 @@ public class HardwareStore {
     public Servo intakeGrab;
     public Servo intakeRotate;
     public Servo intakeFlip;
+    public Servo extensionHold;
+
     public Grabber grabber;
     public Servo grabberServo;
     public Servo grabberFlip;
@@ -55,9 +57,10 @@ public class HardwareStore {
         intakeRotate = hardwareMap.get(Servo.class, "intakeRotate");
         extensionMotor = hardwareMap.get(DcMotor.class, "extension");
         intakeFlip = hardwareMap.get(Servo.class, "intakeFlip");
+        extensionHold = hardwareMap.get(Servo.class, "extensionHold");
         extensionMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        intake = new Intake(intakeGrab, intakeRotate, intakeFlip, extensionMotor);
+        intake = new Intake(intakeGrab, intakeRotate, intakeFlip, extensionHold, extensionMotor);
 
         grabberServo = hardwareMap.get(Servo.class, "grabberServo");
         grabberFlip = hardwareMap.get(Servo.class, "grabberFlip");

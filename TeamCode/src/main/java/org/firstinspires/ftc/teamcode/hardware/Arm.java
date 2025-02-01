@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.hardware;
 import android.util.Log;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 public class Arm {
@@ -12,10 +13,9 @@ public class Arm {
     public TouchSensor rightLimitSwitch;
 
     public static final int LIFT_BASKET = 4250;
-    public static final int LIFT_ABOVE_BAR = 1750;
-    public static final int LIFT_PLACE_SPECIMEN = 1860;
-    public static final int LIFT_BELOW_BAR = 1600;
-    public static final int LIFT_GRAB_FROM_WALL = 120;
+    public static final int LIFT_PLACE_PRELOAD_SPECIMEN = 1980;
+    public static final int LIFT_PLACE_SPECIMEN = 1920;
+    public static final int LIFT_GRAB_FROM_WALL = 200;
     public static final int LIFT_RAISE_ABOVE_WALL = 150;
     public static final int LIFT_TOUCH_LOW_BAR = 1250;
     public static final int LIFT_ABOVE_LOW_BAR = 1400;
@@ -82,7 +82,8 @@ public class Arm {
     }
 
     public void liftByEncoder(int position, double power) {
-
+        liftLeft.setDirection(DcMotor.Direction.FORWARD);
+        liftRight.setDirection(DcMotor.Direction.REVERSE);
         liftLeft.setTargetPosition(position);
         liftLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         liftRight.setTargetPosition(position);

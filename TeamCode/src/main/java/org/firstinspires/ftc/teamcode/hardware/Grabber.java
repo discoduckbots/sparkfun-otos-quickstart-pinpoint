@@ -6,11 +6,13 @@ public class Grabber {
     Servo grabberServo = null;
     Servo grabberFlip = null;
 
-    private static final double GRABBER_OPEN_POS = 0;
-    private static final double GRABBER_CLOSE_POS = 0.65;
+    private static final double GRABBER_OPEN_POS = 0.35;
+    private static final double GRABBER_CLOSE_POS = 0.95;
+    private static final double AUTO_GRAB_POS = 0.97;
     private static final double GRABBER_IN_POS = 0.03;
+    private static final double GRABBER_IN_AUTO = 0.02;
     private static final double GRABBER_OUT_POS = 0.95;
-    private static final double GRABBER_MID_POS = 0.6; //needs to be tested / adjusted
+    private static final double GRABBER_MID_POS = 0.5; //needs to be tested / adjusted
     private boolean grabberIn;
     private boolean grabberOut;
     private boolean grabberMid;
@@ -28,6 +30,10 @@ public class Grabber {
     public void closeGrabber() {
         grabberServo.setPosition(GRABBER_CLOSE_POS);
         grabberOpen = false;
+    }
+
+    public void autoCloseGrabber() {
+        grabberServo.setPosition(AUTO_GRAB_POS);
     }
 
     public void openGrabber() {
@@ -78,6 +84,20 @@ public class Grabber {
         if (!grabberOpen) {
             grabberFlip.setDirection(Servo.Direction.FORWARD); //test comment
             grabberFlip.setPosition(GRABBER_IN_POS);
+            grabberIn = true;
+            grabberOut = false;
+            grabberMid = false;
+
+        }
+    }
+
+    public void flipGrabberInAuto() {
+        if (grabberOpen) {
+            closeGrabber();
+        }
+        if (!grabberOpen) {
+            grabberFlip.setDirection(Servo.Direction.FORWARD); //test comment
+            grabberFlip.setPosition(GRABBER_IN_AUTO);
             grabberIn = true;
             grabberOut = false;
             grabberMid = false;
