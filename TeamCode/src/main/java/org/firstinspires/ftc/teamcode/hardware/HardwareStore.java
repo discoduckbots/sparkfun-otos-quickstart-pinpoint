@@ -17,8 +17,8 @@ public class HardwareStore {
     public DcMotorEx backRight ;
     public DcMotorEx backLeft ;
     private Arm arm;
-    public DcMotor liftLeft;
-    public DcMotor liftRight;
+    public DcMotorEx liftLeft;
+    public DcMotorEx liftRight;
     public DcMotor extensionMotor;
     public Intake intake;
     public Servo intakeGrab;
@@ -43,10 +43,10 @@ public class HardwareStore {
         backRight = hardwareMap.get(DcMotorEx.class, "backRight");
         backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
 
-        liftLeft = hardwareMap.get(DcMotor.class, "liftLeft");
+        liftLeft = hardwareMap.get(DcMotorEx.class, "liftLeft");
         liftLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        liftRight = hardwareMap.get(DcMotor.class, "liftRight");
+        liftRight = hardwareMap.get(DcMotorEx.class, "liftRight");
         liftRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftLimitSwitch = hardwareMap.get(TouchSensor.class, "leftLimitSwitch");
         rightLimitSwitch = hardwareMap.get(TouchSensor.class, "rightLimitSwitch");

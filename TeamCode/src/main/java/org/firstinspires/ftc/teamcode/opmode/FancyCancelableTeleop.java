@@ -101,7 +101,7 @@ public class FancyCancelableTeleop extends LinearOpMode {
             else if (gamepad2.dpad_down){
                 arm.lower(LIFT_SPEED);
             }
-            else if (gamepad1.x) {
+            else if (gamepad2.dpad_right) {
                 arm.liftByEncoder(Arm.LIFT_PLACE_SPECIMEN, LIFT_SPEED);
             }
             else{

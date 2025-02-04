@@ -19,8 +19,8 @@ import org.firstinspires.ftc.teamcode.hardware.HardwareStore;
 import org.firstinspires.ftc.teamcode.hardware.Intake;
 
 @Config
-@Autonomous(name = "Sample Auto", group = "Autonomous")
-public class SampleAuto extends DuckbotAuto {
+@Autonomous(name = "Test Sample Auto", group = "Autonomous")
+public class TestSampleAuto extends DuckbotAuto {
 
     private Grabber teleGrabber = null;
     private Intake teleIntake = null;
@@ -58,11 +58,18 @@ public class SampleAuto extends DuckbotAuto {
                         new ParallelAction(
                                 arm.liftToTargetPosition(0),
                                 driveForwardLittle.build(), //I added a driveForwardLittle Traj to prevent hitting the blocks
-                                intake.intakeDown()
+                                //intake.intakeDown() old code
+                                new SequentialAction( // new change
+                                        intake.intakeDown(),
+                                        new SleepAction(0.2),
+                                        intake.intakeRotate(rotatePos)
+                                )
                                 ),
-                        new SleepAction(0.4),
+                        new SleepAction(1.0),
                         intake.intakeClose(),
                         new SleepAction(0.4),
+                        intake.intakeRotate(0), //new change
+                        new SleepAction(0.3), //new change
                         intake.intakeUp(),
                         intake.retract(),
                         new SleepAction(0.4),
@@ -84,7 +91,7 @@ public class SampleAuto extends DuckbotAuto {
                                     arm.liftToTargetPosition(Arm.LIFT_BASKET)
                             )
                     ),
-                    new SleepAction(1.5),
+                    new SleepAction(1.2),
                     grabber.grabberOut(),
                     new SleepAction(1.0),
                     grabber.grabberRelease(),
@@ -141,7 +148,7 @@ public class SampleAuto extends DuckbotAuto {
                                     scorePreload.build(),
                                     arm.liftToTargetPosition(Arm.LIFT_BASKET)
                                     ),
-                            new SleepAction(1.5),
+                            new SleepAction(1.0),
                             grabber.grabberOut()
                             /*
                             new SleepAction(1.0),
@@ -167,12 +174,16 @@ public class SampleAuto extends DuckbotAuto {
             TrajectoryActionBuilder cycle2 = cycleSample(cycle1, 0,
                     29, 17.5, 0,
                     scoringPose.x, scoringPose.y, scoringHeading);
+// need to test
+            TrajectoryActionBuilder cycle3 = cycleSample(cycle2, 1.0,// I don't know if the 3rd one is going to work b/c we probably need to rotate the intake to grab it
+                   -30, -18, 90,
+                    scoringPose.x, scoringPose.y, scoringHeading);
 
-            /* Park */
+            /* Park */ /*
             TrajectoryActionBuilder driveToPark = cycle2.endTrajectory().fresh()
-                    .strafeToLinearHeading(new Vector2d(39, -7), Math.toRadians(90)) // back up from basket and turn - x was 44
+                    .strafeToLinearHeading(new Vector2d(44, -7), Math.toRadians(90)) // back up from basket and turn
                     .strafeTo(new Vector2d(44, -23.5)); // strafe to chamber //linear slide touch bar pos: 1250
-/*
+
             Actions.runBlocking(
                     new SequentialAction(
                             new ParallelAction(

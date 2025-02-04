@@ -12,7 +12,7 @@ public class Grabber {
     private static final double GRABBER_IN_POS = 0.03;
     private static final double GRABBER_IN_AUTO = 0.02;
     private static final double GRABBER_OUT_POS = 0.95;
-    private static final double GRABBER_MID_POS = 0.5; //needs to be tested / adjusted
+    private static final double GRABBER_MID_POS = 0.45; //needs to be tested / adjusted was .5
     private boolean grabberIn;
     private boolean grabberOut;
     private boolean grabberMid;

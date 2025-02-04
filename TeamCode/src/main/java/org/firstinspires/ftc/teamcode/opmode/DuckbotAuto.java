@@ -162,6 +162,19 @@ public abstract class DuckbotAuto extends LinearOpMode {
             }
         }
 
+        public class IntakeMid implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                if (!initialized) {
+                    initialized = true;
+                    intake.flipIntakeDownUp();
+                }
+                return  false;
+            }
+        }
+
         public class Extend implements Action {
 
 
@@ -195,6 +208,28 @@ public abstract class DuckbotAuto extends LinearOpMode {
             }
         }
 
+        public class IntakeRotate implements Action {
+
+
+            private boolean initialized = false;
+            private double targetPosition = 0;
+
+            public IntakeRotate(double targetPosition){
+                super();
+                this.targetPosition = targetPosition;
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                if (!initialized){
+                    intake.intakeRotate.setPosition(targetPosition);
+                    initialized = true;
+                }
+
+                return false;
+            }
+        }
+
 
         public Action intakeClose(){
             return new IntakeClose();
@@ -204,15 +239,11 @@ public abstract class DuckbotAuto extends LinearOpMode {
         public Action intakeOpen(){
             return new IntakeOpen();
         }
-
         public Action intakeUp(){
             return new IntakeUp();
         }
-
-        public Action intakeDown(){
-            return new IntakeDown();
-        }
-
+        public Action intakeDown(){return new IntakeDown();}
+        public Action intakeMid(){return new IntakeMid();}
         public Action extend(){
             return new Extend();
         }
@@ -220,6 +251,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
         public Action retract(){
             return new Retract();
         }
+        public Action intakeRotate(double targetPosition) {return new IntakeRotate(targetPosition);}
     }
 
     public class AutoGrabber {

@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 public class Arm {
-    public DcMotor liftLeft;
-    public DcMotor liftRight;
+    public DcMotorEx liftLeft;
+    public DcMotorEx liftRight;
     public TouchSensor leftLimitSwitch;
     public TouchSensor rightLimitSwitch;
 
@@ -24,7 +24,7 @@ public class Arm {
 // above bar - L: 2134, R:4154
     // below bar - L-1193, R: -3206
 
-    public Arm(DcMotor liftMotor1, DcMotor liftMotor2, TouchSensor leftLimitSwitch, TouchSensor rightLimitSwitch) {
+    public Arm(DcMotorEx liftMotor1, DcMotorEx liftMotor2, TouchSensor leftLimitSwitch, TouchSensor rightLimitSwitch) {
 
         this.liftLeft = liftMotor1;
         this.liftLeft.setDirection(DcMotor.Direction.FORWARD);
@@ -49,10 +49,10 @@ public class Arm {
     }
 
     public void lift(double power) {
-        liftLeft.setDirection(DcMotor.Direction.FORWARD);
-        liftRight.setDirection(DcMotor.Direction.REVERSE);
-        liftLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        liftRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        liftLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        liftRight.setDirection(DcMotorEx.Direction.REVERSE);
+        liftLeft.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        liftRight.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         liftLeft.setPower(power);
         liftRight.setPower(power);
         Log.d("LIFT ", "pos1: " + liftLeft.getCurrentPosition() + "pos2: " + liftRight.getCurrentPosition());
@@ -61,18 +61,18 @@ public class Arm {
 
     public void lower(double power) {
         if (!leftLimitSwitch.isPressed() && !rightLimitSwitch.isPressed()) {
-            liftLeft.setDirection(DcMotor.Direction.REVERSE);
-            liftRight.setDirection(DcMotor.Direction.FORWARD);
-            liftLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            liftRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            liftLeft.setPower(power);
-            liftRight.setPower(power);
+            liftLeft.setDirection(DcMotorEx.Direction.REVERSE);
+            liftRight.setDirection(DcMotorEx.Direction.FORWARD);
+            liftLeft.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+            liftRight.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+            liftLeft.setVelocity(power);
+            liftRight.setVelocity(power);
             Log.d("LIFT ", "pos1: " + liftLeft.getCurrentPosition() + "pos2: " + liftRight.getCurrentPosition());
         } else {
             liftLeft.setPower(0);
             liftRight.setPower(0);
-            liftLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            liftRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            liftLeft.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+            liftRight.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         }
     }
 
@@ -82,14 +82,14 @@ public class Arm {
     }
 
     public void liftByEncoder(int position, double power) {
-        liftLeft.setDirection(DcMotor.Direction.FORWARD);
-        liftRight.setDirection(DcMotor.Direction.REVERSE);
+        liftLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        liftRight.setDirection(DcMotorEx.Direction.REVERSE);
         liftLeft.setTargetPosition(position);
-        liftLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        liftLeft.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         liftRight.setTargetPosition(position);
-        liftRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        liftLeft.setPower(power);
-        liftRight.setPower(power);
+        liftRight.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        liftLeft.setVelocity(power);
+        liftRight.setVelocity(power);
     }
 
     public void lowerByTouch(double power) {
