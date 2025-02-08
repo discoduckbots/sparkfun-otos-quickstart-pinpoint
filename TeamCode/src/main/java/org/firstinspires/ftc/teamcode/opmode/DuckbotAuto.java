@@ -43,8 +43,6 @@ public abstract class DuckbotAuto extends LinearOpMode {
         }
 
         public class ArmLiftToPosition implements Action {
-
-
             private boolean initialized = false;
             private int targetPosition = 0;
 

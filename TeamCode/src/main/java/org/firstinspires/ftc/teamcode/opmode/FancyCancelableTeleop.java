@@ -105,7 +105,7 @@ public class FancyCancelableTeleop extends LinearOpMode {
                 arm.liftByEncoder(Arm.LIFT_PLACE_SPECIMEN, LIFT_SPEED);
             }
             else{
-                arm.stop();
+                    arm.stop();
             }
 
             if (gamepad2.left_trigger > 0.2) {

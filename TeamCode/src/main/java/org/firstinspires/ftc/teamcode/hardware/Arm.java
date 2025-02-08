@@ -65,8 +65,8 @@ public class Arm {
             liftRight.setDirection(DcMotorEx.Direction.FORWARD);
             liftLeft.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
             liftRight.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-            liftLeft.setVelocity(power);
-            liftRight.setVelocity(power);
+            liftLeft.setPower(power);
+            liftRight.setPower(power);
             Log.d("LIFT ", "pos1: " + liftLeft.getCurrentPosition() + "pos2: " + liftRight.getCurrentPosition());
         } else {
             liftLeft.setPower(0);
@@ -88,8 +88,9 @@ public class Arm {
         liftLeft.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         liftRight.setTargetPosition(position);
         liftRight.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        liftLeft.setVelocity(power);
-        liftRight.setVelocity(power);
+        liftLeft.setVelocity(500);
+        liftRight.setVelocity(500);
+
     }
 
     public void lowerByTouch(double power) {
