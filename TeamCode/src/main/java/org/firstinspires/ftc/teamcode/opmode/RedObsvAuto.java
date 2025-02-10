@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
@@ -13,10 +14,12 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.hardware.Arm;
 import org.firstinspires.ftc.teamcode.hardware.Grabber;
 import org.firstinspires.ftc.teamcode.hardware.HardwareStore;
+import org.firstinspires.ftc.teamcode.hardware.Intake;
 
 @Config
 @Autonomous(name = "RedSpecimenAuto", group = "Autonomous")
@@ -24,6 +27,8 @@ public class RedObsvAuto extends DuckbotAuto {
 
     MecanumDrive drive = null;
     Grabber teleGrabber = null;
+
+    Intake teleIntake = null;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -35,114 +40,280 @@ public class RedObsvAuto extends DuckbotAuto {
 
         drive = hardwareStore.getDrive();
         teleGrabber = hardwareStore.getGrabber();
+        teleIntake = hardwareStore.getIntake();
 
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
-        teleGrabber.closeGrabber();
+        teleGrabber.autoCloseGrabber();
+        teleIntake.rotateIntakeTo0();
+        teleGrabber.autoCloseGrabber();
 
-        waitForStart();
-        TranslationalVelConstraint slowVel = new TranslationalVelConstraint(40);
-        ProfileAccelConstraint slowAccel = new ProfileAccelConstraint(-40, 40);
-        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(0));
-        Vector2d grabPose = new Vector2d(-15, 23);
-        Vector2d closeGrabPose = new Vector2d(-15, 23);
-        Vector2d awayFromWallPose = new Vector2d(-15, 21.5);
-        Vector2d awayFromBarPose = new Vector2d(-12, 15);
-
-
-        TrajectoryActionBuilder deliverPreload = drive.actionBuilder(initialPose)
+        TrajectoryActionBuilder deliverPreload = drive.actionBuilder(new Pose2d(0,0,0))
                 .strafeTo(new Vector2d(-20, -12.7)); // move to bar
 
         TrajectoryActionBuilder ramBarForPreload = deliverPreload.endTrajectory().fresh()
-                .strafeTo(new Vector2d(-31.4, -12.7));
+                .strafeTo(new Vector2d(-33, -12.7));
 
         TrajectoryActionBuilder backUpFromBar = ramBarForPreload.endTrajectory().fresh()
-                .strafeTo(new Vector2d(-20, -12.7));
+                .strafeTo(new Vector2d(-22, -12.7))
+                .strafeToLinearHeading(new Vector2d(-27, 13.4), Math.toRadians(-180));
 
+        TrajectoryActionBuilder grabFirst = backUpFromBar.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-30, 26))
+                .strafeTo(new Vector2d(-37, 26.5));
 
-        TrajectoryActionBuilder pushSamplesToObsZone = backUpFromBar.endTrajectory().fresh()
-                .strafeToLinearHeading(new Vector2d(-23, 10), Math.toRadians(180)) // move over and turn 180
-                .strafeTo(new Vector2d(-56.5, 28.8)); //to first push position
-                //.strafeTo(new Vector2d(-12.5, 28.8)); //push first sample back
-                //.strafeTo(new Vector2d(-56.5, 36)) //position for second sample
-                //.strafeTo(new Vector2d(-12.5, 36)) //push second sample back
-                //.strafeTo(new Vector2d(-56, 42.5))//position for third sample
-                //.strafeTo(new Vector2d(-12.5, 42.5)) //push third sample back
+        TrajectoryActionBuilder deliverFirst = grabFirst.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-18, 26.5));
 
-        //TrajectoryActionBuilder firstMoveToWall = pushSamplesToObsZone.endTrajectory().fresh()
-        //        .strafeTo(grabPose);
+        TrajectoryActionBuilder grabSecond = deliverFirst.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-27, 37.5))
+                .strafeTo(new Vector2d(-37, 37.5));
 
-        //TrajectoryActionBuilder pickupFirstSample = firstMoveToWall.endTrajectory().fresh()
-        //        .strafeTo(closeGrabPose);
+        TrajectoryActionBuilder deliverSecond = grabSecond.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-18, 35));
 
-       /* TrajectoryActionBuilder deliverFirstSample = pushSamplesToObsZone.endTrajectory().fresh()
-                .strafeTo(awayFromWallPose) //back away from wall
-                .strafeToLinearHeading(new Vector2d(-27, -8.5), Math.toRadians(0))
+        TrajectoryActionBuilder firstGrabFromWall = deliverSecond.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-14, 35));
+
+        TrajectoryActionBuilder firstDriveToBar = firstGrabFromWall.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-20, 25)) //back away from wall
+                .strafeToLinearHeading(new Vector2d(-20, -8.5), Math.toRadians(0))
                 .strafeTo(new Vector2d(-29, -8.5));
 
-        TrajectoryActionBuilder firstRamBar = deliverFirstSample.endTrajectory().fresh()
-                .strafeTo(new Vector2d(-35, -8.5)); // needs to be tuned/tested
+        TrajectoryActionBuilder firstRamBar = firstDriveToBar.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-33, -8.5));
 
         TrajectoryActionBuilder firstBackUpFromBar = firstRamBar.endTrajectory().fresh()
-                .strafeTo(awayFromBarPose);
+                .strafeTo(new Vector2d(-32, -8.5));
 
-        TrajectoryActionBuilder secondMoveToWall = firstBackUpFromBar.endTrajectory().fresh()
-                .strafeToLinearHeading(grabPose, Math.toRadians(-180));
+        TrajectoryActionBuilder secondGrabFromWall = firstBackUpFromBar.endTrajectory().fresh()
+                .strafeToLinearHeading(new Vector2d(-20,23), Math.toRadians(-180))
+                .strafeTo(new Vector2d(-14, 23));
 
-        TrajectoryActionBuilder pickupSecondSample = secondMoveToWall.endTrajectory().fresh()
-                .strafeTo(closeGrabPose);
-
-        TrajectoryActionBuilder deliverSecondSample = pickupSecondSample.endTrajectory().fresh()
-                .strafeTo(awayFromWallPose)
-                .strafeToLinearHeading(new Vector2d(-27, -4), Math.toRadians(0))
+        TrajectoryActionBuilder secondDriveToBar = secondGrabFromWall.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-20, 16)) //back away from wall
+                .strafeToLinearHeading(new Vector2d(-20, -4), Math.toRadians(0))
                 .strafeTo(new Vector2d(-29, -4));
 
-        TrajectoryActionBuilder secondRamBar = deliverSecondSample.endTrajectory().fresh()
-                .strafeTo(new Vector2d(-35, -4)); // needs to be tuned/tested
+        TrajectoryActionBuilder secondRamBar = secondDriveToBar.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-33, -4));
 
-        TrajectoryActionBuilder thirdMoveToWall = secondRamBar.endTrajectory().fresh()
-                .strafeToLinearHeading(grabPose, Math.toRadians(-180));
+        TrajectoryActionBuilder secondBackUpFromBar = firstRamBar.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-20, -4));
 
-        TrajectoryActionBuilder pickupThirdSample = thirdMoveToWall.endTrajectory().fresh()
-                .strafeTo(closeGrabPose);
+        TrajectoryActionBuilder driveToPark = secondRamBar.endTrajectory().fresh()
+                        .strafeToLinearHeading(new Vector2d(-20, 23), Math.toRadians(-180));
 
-        TrajectoryActionBuilder deliverThirdSample = pickupThirdSample.endTrajectory().fresh()
-                .strafeTo(awayFromWallPose)
-                .strafeToLinearHeading(new Vector2d(-27, -0.5), Math.toRadians(0))
-                .strafeTo(new Vector2d(-29, -0.5));
+        telemetry.addData("ready to start", "");
+        telemetry.update();
 
-        TrajectoryActionBuilder thirdRamWall = deliverThirdSample.endTrajectory().fresh()
-                .strafeTo(new Vector2d(-33, -0.5)); // needs to be tuned/tested
+        Actions.runBlocking(new SequentialAction(
+                 grabber.grabberMiddle(),
+                grabber.grabberGrab()
+                )
+        );
 
-*/
+        waitForStart();
+
         if (opModeIsActive()) {
             if (isStopRequested()) return;
-// Score Preload Speciment
+
+// Drive to Bar Preload
+            Actions.runBlocking(
+                        new ParallelAction(
+                                grabber.grabberGrab(),
+                                deliverPreload.build(),
+                                arm.liftToTargetPosition(Arm.LIFT_PLACE_PRELOAD_SPECIMEN),
+                                grabber.grabberOut()
+                        )
+            );
+
+// Ram bar preload
             Actions.runBlocking(
                     new SequentialAction(
-                            grabber.grabberGrab(),
-                        new ParallelAction(
-                                deliverPreload.build(),
-                                arm.liftToTargetPosition(Arm.LIFT_PLACE_SPECIMEN),
-                                grabber.grabberOut()
-                        ),
-                            new SleepAction(0.05),
                             ramBarForPreload.build(),
                             new SleepAction(0.1),
                             grabber.grabberRelease()
                     )
             );
-// Push Samples
+
+//Back up from bar
             Actions.runBlocking(
                     new SequentialAction(
                             backUpFromBar.build(),
-                            grabber.grabberIn(),
-                            new ParallelAction(
-                                    arm.liftToTargetPosition(Arm.LIFT_GRAB_FROM_WALL),
-                                    pushSamplesToObsZone.build()
+                            grabber.grabberIn()
+                    )
+            );
+
+// Go to Grab First Sample
+            Actions.runBlocking(
+                    new ParallelAction(
+                            arm.liftToTargetPosition(0),
+                            grabFirst.build(),
+                            intake.intakeDown()
+                    )
+            );
+
+ // Grab First sample
+            Actions.runBlocking(
+                    new SequentialAction(
+                            intake.intakeClose(),
+                            new SleepAction(0.4)
+                    )
+            );
+
+    // deliver first sample
+            Actions.runBlocking(
+                    new ParallelAction(
+                            deliverFirst.build(),
+                            grabber.grabberRelease(),
+                            new SequentialAction(
+                                    intake.intakeUp(),
+                                    new SleepAction(0.5),
+                                    grabber.grabberGrab(),
+                                    new SleepAction(0.2),
+                                    intake.intakeOpen()
                             )
                     )
             );
+//drop first sample
+            Actions.runBlocking(
+                    new SequentialAction(
+                            arm.liftToTargetPosition(Arm.LIFT_GRAB_FROM_WALL),
+                            grabber.grabberOut(),
+                            new SleepAction(0.4),
+                            grabber.grabberRelease(),
+                            new SleepAction(0.2)
+                    )
+            );
+
+            // Go to Grab Second Sample
+            Actions.runBlocking(
+                    new ParallelAction(
+                            arm.liftToTargetPosition(0),
+                            grabSecond.build(),
+                            intake.intakeDown(),
+                            grabber.grabberIn()
+                    )
+            );
+
+            // Grab Second sample
+            Actions.runBlocking(
+                    new SequentialAction(
+                            intake.intakeClose(),
+                            new SleepAction(0.4)
+                    )
+            );
+
+            // deliver second sample
+            Actions.runBlocking(
+                    new ParallelAction(
+                            deliverSecond.build(),
+                            grabber.grabberRelease(),
+                            new SequentialAction(
+                                    intake.intakeUp(),
+                                    new SleepAction(0.5),
+                                    grabber.grabberGrab(),
+                                    new SleepAction(0.3),
+                                    intake.intakeOpen()
+                            )
+                    )
+            );
+
+            //drop second sample
+            Actions.runBlocking(
+                    new SequentialAction(
+                            arm.liftToTargetPosition(Arm.LIFT_GRAB_FROM_WALL),
+                            grabber.grabberOut(),
+                            new SleepAction(0.3),
+                            grabber.grabberRelease(),
+                            new SleepAction(0.2)
+                    )
+            );
+
+
+//Grab first specimen from wall
+            Actions.runBlocking(
+                    new SequentialAction(
+                            firstGrabFromWall.build(),
+                            new SleepAction(0.2),
+                            grabber.grabberGrab(),
+                            new SleepAction(0.2)
+                    )
+            );
+
+//Score first specimen on bar
+            Actions.runBlocking(
+                    new SequentialAction(
+                            new ParallelAction(
+                                    firstDriveToBar.build(),
+                                    arm.liftToTargetPosition(Arm.LIFT_PLACE_SPECIMEN),
+                                    grabber.grabberOut()
+                            ),
+                            firstRamBar.build(),
+                            new SleepAction(0.1),
+                            grabber.grabberRelease()
+                    )
+            );
+
+            //first back up from bar
+            Actions.runBlocking(
+                    new ParallelAction(
+                            firstBackUpFromBar.build()
+                    )
+            );
+
+            //Grab second specimen from wall
+            Actions.runBlocking(
+                    new SequentialAction(
+                            new ParallelAction(
+                                    secondGrabFromWall.build(),
+                                    arm.liftToTargetPosition(Arm.LIFT_GRAB_FROM_WALL)
+                                    ),
+                            new SleepAction(0.2),
+                            grabber.grabberGrab(),
+                            new SleepAction(0.2)
+                    )
+            );
+
+//Score second specimen on bar
+            Actions.runBlocking(
+                    new SequentialAction(
+                            new ParallelAction(
+                                    secondDriveToBar.build(),
+                                    arm.liftToTargetPosition(Arm.LIFT_PLACE_SPECIMEN),
+                                    grabber.grabberOut()
+                            ),
+                            secondRamBar.build(),
+                            new SleepAction(0.1),
+                            grabber.grabberRelease()
+                    )
+            );
+
+            //second back up from bar
+            Actions.runBlocking(
+                    new SequentialAction(
+                            secondBackUpFromBar.build(),
+                            grabber.grabberMiddle()
+                    )
+            );
+
+            Actions.runBlocking(
+                    new SequentialAction(
+                            new ParallelAction(
+                                    driveToPark.build(),
+                                    arm.liftToTargetPosition(Arm.LIFT_GRAB_FROM_WALL)
+                            )
+                            //new SleepAction(0.2),
+                            //grabber.grabberGrab(),
+                            //new SleepAction(0.2)
+                    )
+            );
+
+
+
+
+
   /*
  //grab first specimen from wall
             Actions.runBlocking(

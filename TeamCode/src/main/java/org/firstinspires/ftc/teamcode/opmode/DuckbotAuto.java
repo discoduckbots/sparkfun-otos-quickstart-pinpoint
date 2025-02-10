@@ -18,7 +18,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
     private static final double INTAKE_TIME = 1.5;
     private static final double INTAKE_SPEED = 1.0;
     private static final double LIFT_SPEED = 1.0;
-    private static final double EXTENSION_SPEED = 0.3;
+    private static final double EXTENSION_SPEED = 1.0;
 
     /**
      * Given a starting position and a desired x, y, heading, returns a trajectory
@@ -43,8 +43,6 @@ public abstract class DuckbotAuto extends LinearOpMode {
         }
 
         public class ArmLiftToPosition implements Action {
-
-
             private boolean initialized = false;
             private int targetPosition = 0;
 
@@ -60,9 +58,9 @@ public abstract class DuckbotAuto extends LinearOpMode {
                     initialized = true;
                 }
 
-                if (arm.getLiftPos() != targetPosition){
-                    return true;
-                }
+//                if (arm.getLiftPos() != targetPosition){
+//                    return true;
+//                }
 
                 return false;
             }
@@ -120,6 +118,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
                 intake.stop(); */
                 return  false;
             }
+
         }
 
         public class IntakeOpen implements Action {
@@ -161,7 +160,21 @@ public abstract class DuckbotAuto extends LinearOpMode {
             }
         }
 
+        public class IntakeMid implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                if (!initialized) {
+                    initialized = true;
+                    intake.flipIntakeDownUp();
+                }
+                return  false;
+            }
+        }
+
         public class Extend implements Action {
+
 
             private boolean initialized = false;
 
@@ -193,6 +206,28 @@ public abstract class DuckbotAuto extends LinearOpMode {
             }
         }
 
+        public class IntakeRotate implements Action {
+
+
+            private boolean initialized = false;
+            private double targetPosition = 0;
+
+            public IntakeRotate(double targetPosition){
+                super();
+                this.targetPosition = targetPosition;
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                if (!initialized){
+                    intake.intakeRotate.setPosition(targetPosition);
+                    initialized = true;
+                }
+
+                return false;
+            }
+        }
+
 
         public Action intakeClose(){
             return new IntakeClose();
@@ -202,15 +237,11 @@ public abstract class DuckbotAuto extends LinearOpMode {
         public Action intakeOpen(){
             return new IntakeOpen();
         }
-
         public Action intakeUp(){
             return new IntakeUp();
         }
-
-        public Action intakeDown(){
-            return new IntakeDown();
-        }
-
+        public Action intakeDown(){return new IntakeDown();}
+        public Action intakeMid(){return new IntakeMid();}
         public Action extend(){
             return new Extend();
         }
@@ -218,6 +249,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
         public Action retract(){
             return new Retract();
         }
+        public Action intakeRotate(double targetPosition) {return new IntakeRotate(targetPosition);}
     }
 
     public class AutoGrabber {
@@ -236,7 +268,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
                 if (!initialized) {
                     initialized = true;
                     resetRuntime();
-                    grabber.closeGrabber();
+                    grabber.autoCloseGrabber();
                 }
 
                 return false;
@@ -266,7 +298,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 if (!initialized) {
                     initialized = true;
-                    grabber.flipGrabberIn();
+                    grabber.flipGrabberInAuto();
                 }
                 return  false;
             }
