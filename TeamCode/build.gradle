@@ -39,4 +39,5 @@ dependencies {
     implementation "com.acmerobotics.roadrunner:actions:1.0.0"
     implementation "com.acmerobotics.dashboard:dashboard:0.4.16"
     implementation "com.github.jdhs-ftc:road-runner-ftc-otos:8e83c17ff7"
+    implementation 'org.openpnp:opencv:4.9.0-0'
 }
